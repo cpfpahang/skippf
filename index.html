@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SKIPPF</title>
+<meta name="theme-color" content="#000000">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #000;
+    color: #fff;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    text-align: center;
+  }
+  .logo { width: 180px; height: 180px; border-radius: 32px; margin-bottom: 20px; }
+  h1 { font-size: 30px; letter-spacing: 2px; margin-bottom: 4px; }
+  .sub { color: #aaa; font-size: 14px; margin-bottom: 32px; }
+  .btn {
+    display: inline-block;
+    background: #d82c2c;
+    color: #fff;
+    text-decoration: none;
+    font-size: 18px;
+    font-weight: 600;
+    padding: 16px 48px;
+    border-radius: 50px;
+    margin-bottom: 40px;
+    box-shadow: 0 4px 14px rgba(216,44,44,.4);
+  }
+  .btn:active { transform: scale(.97); }
+  .guide {
+    background: #141414;
+    border: 1px solid #2a2a2a;
+    border-radius: 12px;
+    padding: 18px 22px;
+    max-width: 420px;
+    font-size: 13.5px;
+    line-height: 1.7;
+    color: #ccc;
+    text-align: left;
+  }
+  .guide b { color: #fff; }
+  .guide .t { color: #d82c2c; font-weight: 700; display: block; margin-bottom: 6px; text-align: center; }
+  .loading { color: #888; font-size: 14px; }
+</style>
+<script>
+  var APP_URL = 'https://script.google.com/a/macros/moh.gov.my/s/AKfycbxf9yiXaoB2Ged-YgXmALTABkJbAHxcsNa-O9ysllx7GTkXwokULZmJgXUaU0KxceSk/exec';
+  // Pegawai yang pernah masuk akan terus dibawa ke SKIPPF tanpa perlu tekan butang lagi
+  if (localStorage.getItem('skippf_auto') === '1') {
+    document.write('<meta http-equiv="refresh" content="0;url=' + APP_URL + '">');
+    location.replace(APP_URL);
+  }
+  function masuk(e) {
+    e.preventDefault();
+    try { localStorage.setItem('skippf_auto', '1'); } catch (err) {}
+    location.href = APP_URL;
+  }
+</script>
+</head>
+<body>
+  <img class="logo" src="icon-512.png" alt="Logo SKIPPF">
+  <h1>SKIPPF</h1>
+  <p class="sub">CPF Pahang</p>
+
+  <a class="btn" href="#" onclick="masuk(event)">Buka SKIPPF ➜</a>
+
+  <div class="guide">
+    <span class="t">📱 Simpan di Skrin Utama (sekali sahaja)</span>
+    <b>Android (Chrome):</b> Tekan menu <b>⋮</b> di atas kanan → <b>"Tambah pada Skrin utama"</b> → Tambah.<br>
+    <b>iPhone (Safari):</b> Tekan butang <b>Kongsi</b> → <b>"Add to Home Screen"</b> → Add.<br><br>
+    Selepas disimpan, tekan ikon SKIPPF di skrin utama untuk terus masuk.
+  </div>
+</body>
+</html>
