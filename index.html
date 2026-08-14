@@ -39,6 +39,31 @@
     box-shadow: 0 4px 14px rgba(216,44,44,.4);
   }
   .btn:active { transform: scale(.97); }
+  .btn:focus-visible {
+    outline: 3px solid #fff;
+    outline-offset: 4px;
+  }
+  .access-note {
+    max-width: 420px;
+    margin: -22px 0 24px;
+    color: #ddd;
+    font-size: 14px;
+    line-height: 1.55;
+  }
+  .access-note strong { color: #fff; }
+  .help {
+    max-width: 420px;
+    margin: 0 0 22px;
+    color: #ccc;
+    font-size: 13.5px;
+    line-height: 1.6;
+  }
+  .help summary {
+    color: #fff;
+    cursor: pointer;
+    font-weight: 700;
+  }
+  .help p { margin-top: 10px; }
   .guide {
     background: #141414;
     border: 1px solid #2a2a2a;
@@ -55,18 +80,18 @@
   .loading { color: #888; font-size: 14px; }
 </style>
 <script>
-    var APP_URL = 'https://script.google.com/a/macros/moh.gov.my/s/AKfycbzTF6QjgGI-M2GHLEclFVdCdkWzOmQT_7U4SR0BUNPjHGmpE4Xj5KCEf63oPoHOoWuruQ/exec';
+  var APP_URL = 'https://script.google.com/a/macros/moh.gov.my/s/AKfycbzTF6QjgGI-M2GHLEclFVdCdkWzOmQT_7U4SR0BUNPjHGmpE4Xj5KCEf63oPoHOoWuruQ/exec';
   // ?home=1 di hujung URL akan sentiasa papar page ini (elak auto-lompat) -- guna bila nak "Add to Home Screen"
-  var forceHome = window.location.search.indexOf('home') !== -1;
+  var forceHome = new URLSearchParams(window.location.search).has('home');
   // Pegawai yang pernah masuk akan terus dibawa ke SKIPPF tanpa perlu tekan butang lagi
-  if (!forceHome && localStorage.getItem('skippf_auto') === '1') {
+  var autoMasuk = false;
+  try { autoMasuk = localStorage.getItem('skippf_auto') === '1'; } catch (err) {}
+  if (!forceHome && autoMasuk) {
     document.write('<meta http-equiv="refresh" content="0;url=' + APP_URL + '">');
     location.replace(APP_URL);
   }
-  function masuk(e) {
-    e.preventDefault();
+  function ingatAkses() {
     try { localStorage.setItem('skippf_auto', '1'); } catch (err) {}
-    location.href = APP_URL;
   }
 </script>
 </head>
@@ -75,7 +100,18 @@
   <h1>SKIPPF</h1>
   <p class="sub">CPF Pahang</p>
 
-  <a class="btn" href="#" onclick="masuk(event)">Buka SKIPPF ➜</a>
+  <a class="btn"
+     href="https://script.google.com/a/macros/moh.gov.my/s/AKfycbzTF6QjgGI-M2GHLEclFVdCdkWzOmQT_7U4SR0BUNPjHGmpE4Xj5KCEf63oPoHOoWuruQ/exec"
+     onclick="ingatAkses()">Buka SKIPPF ➜</a>
+
+  <p class="access-note">
+    Sila buka menggunakan akaun rasmi KKM <strong>@moh.gov.my</strong>.
+  </p>
+
+  <details class="help">
+    <summary>Tidak boleh akses?</summary>
+    <p>Tutup akaun Google peribadi atau pilih akaun <strong>@moh.gov.my</strong>, kemudian tekan <strong>Buka SKIPPF</strong> semula. Jika masih gagal, cuba Chrome atau Safari terkini.</p>
+  </details>
 
   <div class="guide">
     <span class="t">📱 Simpan di Skrin Utama (sekali sahaja)</span>
