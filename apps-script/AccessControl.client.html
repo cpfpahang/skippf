@@ -1,0 +1,34 @@
+<script>
+function normPic(s) {
+  return String(s || '').toUpperCase().trim().replace(/\s+/g, ' ');
+}
+
+function senaraiPic(s) {
+  return String(s || '').split(/[\/,;]+/).map(normPic).filter(String);
+}
+
+function agihanPics(s) {
+  return Object.keys(petaAgihan(s)).map(normPic).filter(String);
+}
+
+function bolehEdit(row) {
+  var u = STATE.user;
+  if (u.peranan === 'ADMIN') return true;
+  if (u.peranan !== 'PIC') return false;
+
+  var mine = [];
+  (u.pics || []).forEach(function (p) {
+    mine = mine.concat(senaraiPic(p));
+  });
+
+  var assigned = senaraiPic(row.pic);
+  if (String(row.id || '').toUpperCase().indexOf('SKU-') === 0) {
+    assigned = assigned.concat(agihanPics(row.agihan));
+  }
+
+  return assigned.some(function (p) {
+    return mine.indexOf(p) >= 0;
+  });
+}
+</script>
+
