@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="ms">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Panduan Penggunaan | SKIPPF</title>
+  <meta name="theme-color" content="#000000">
+  <style>
+    :root { --red:#d82c2c; --ink:#161616; --muted:#656565; --line:#e6e6e6; }
+    * { box-sizing:border-box; }
+    body { margin:0; background:#f6f6f6; color:var(--ink); font:16px/1.55 "Segoe UI",Arial,sans-serif; }
+    header { background:#000; color:#fff; padding:22px max(20px,calc((100% - 960px)/2)); }
+    .brand { display:flex; gap:13px; align-items:center; text-decoration:none; color:#fff; width:max-content; }
+    .brand img { width:42px; height:42px; border-radius:10px; }
+    .brand strong { display:block; font-size:18px; letter-spacing:1px; }
+    .brand span { color:#bbb; font-size:13px; }
+    main { max-width:960px; margin:auto; padding:34px 20px 72px; }
+    h1 { font-size:clamp(28px,5vw,42px); line-height:1.1; margin:0 0 10px; }
+    .intro { color:var(--muted); max-width:700px; margin:0 0 24px; }
+    .search { width:100%; border:2px solid var(--line); border-radius:12px; background:#fff; padding:15px 17px; font:inherit; outline:0; }
+    .search:focus { border-color:var(--red); box-shadow:0 0 0 3px #f9dede; }
+    .notice { margin:18px 0 26px; padding:13px 16px; background:#fff4f4; border-left:4px solid var(--red); border-radius:6px; font-size:14px; }
+    .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:14px; }
+    .card, details, .bot { background:#fff; border:1px solid var(--line); border-radius:14px; }
+    .card { padding:20px; }
+    .card h2 { font-size:18px; margin:0 0 8px; }
+    .card p { font-size:14px; margin:0; color:var(--muted); }
+    h2.section { margin:34px 0 12px; font-size:22px; }
+    details { margin:10px 0; overflow:hidden; }
+    summary { cursor:pointer; padding:16px 18px; font-weight:700; }
+    details div { padding:0 18px 18px; color:#3f3f3f; }
+    .bot { margin-top:34px; overflow:hidden; }
+    .bot-head { background:#171717; color:#fff; padding:16px 18px; }
+    .bot-head b { display:block; }
+    .bot-head small { color:#cfcfcf; }
+    #messages { min-height:128px; padding:16px; display:grid; gap:10px; }
+    .bubble { max-width:760px; padding:11px 13px; border-radius:10px; background:#f0f0f0; }
+    .bubble.me { margin-left:auto; background:#fee3e3; }
+    form { border-top:1px solid var(--line); padding:12px; display:flex; gap:8px; }
+    form input { min-width:0; flex:1; border:1px solid #cfcfcf; border-radius:9px; padding:11px; font:inherit; }
+    button { border:0; border-radius:9px; background:var(--red); color:#fff; font:inherit; font-weight:700; padding:10px 16px; cursor:pointer; }
+    .back { display:inline-block; color:var(--red); margin-top:26px; font-weight:700; text-decoration:none; }
+  </style>
+</head>
+<body>
+  <header><a class="brand" href="../?home=1"><img src="../icon-192.png" alt=""><div><strong>SKIPPF</strong><span>CPF Pahang</span></div></a></header>
+  <main>
+    <h1>Panduan Penggunaan</h1>
+    <p class="intro">Rujukan ringkas untuk menggunakan SKIPPF. Pilih topik atau tanya Pembantu SKIPPF di bawah.</p>
+    <input class="search" id="search" type="search" placeholder="Cari contoh: akses, dashboard, kemas kini, dokumen" aria-label="Cari panduan">
+    <p class="notice"><b>Privasi:</b> Jangan masukkan nama pegawai, rekod KPI, dokumen atau maklumat sensitif. Pembantu ini hanya menggunakan jawapan panduan yang tersedia dalam halaman ini.</p>
+    <section class="grid" aria-label="Topik utama">
+      <article class="card"><h2>1. Akses SKIPPF</h2><p>Gunakan akaun rasmi KKM <b>@moh.gov.my</b>. Jika gagal, tukar daripada akaun peribadi dan buka semula SKIPPF.</p></article>
+      <article class="card"><h2>2. Dashboard</h2><p>Gunakan dashboard untuk semak status dan pencapaian KPI, QAP serta OBB sebelum tindakan susulan dibuat.</p></article>
+      <article class="card"><h2>3. Kemas kini rekod</h2><p>Pilih rekod di bawah tanggungjawab anda dan gunakan butang Kemaskini. Semak semula nilai sebelum disimpan.</p></article>
+      <article class="card"><h2>4. Direktori Rujukan</h2><p>Gunakan Direktori untuk mendapatkan bahan kerja yang telah dikongsi. Muat naik hanya dokumen yang dibenarkan.</p></article>
+    </section>
+    <h2 class="section">Soalan lazim</h2>
+    <section id="faq">
+      <details><summary>Kenapa saya tidak boleh akses SKIPPF?</summary><div>Pastikan anda menggunakan akaun rasmi <b>@moh.gov.my</b>. Tutup atau tukar akaun Google peribadi, kemudian cuba semula menggunakan Chrome atau Safari terkini.</div></details>
+      <details><summary>Bagaimana saya mengemas kini rekod?</summary><div>Buka modul yang berkaitan, pilih rekod di bawah tanggungjawab anda, tekan <b>Kemaskini</b>, lengkapkan butiran yang perlu dan semak sebelum menyimpan.</div></details>
+      <details><summary>Kenapa butang Kemaskini tidak kelihatan?</summary><div>Akses kemas kini bergantung pada peranan dan tugasan PIC. Jika rekod itu di bawah tanggungjawab anda tetapi butang masih tidak kelihatan, hubungi pentadbir SKIPPF.</div></details>
+      <details><summary>Di mana saya boleh lihat pencapaian?</summary><div>Buka Dashboard untuk melihat ringkasan prestasi KPI, QAP dan OBB. Gunakan rekod terperinci bagi menyemak item yang memerlukan tindakan.</div></details>
+      <details><summary>Apakah yang perlu saya elakkan dalam Pembantu SKIPPF?</summary><div>Jangan kongsi maklumat pegawai, rekod prestasi, dokumen, kata laluan atau data sensitif. Pembantu ini hanya membantu dengan cara menggunakan platform.</div></details>
+    </section>
+    <section class="bot" aria-label="Pembantu SKIPPF">
+      <div class="bot-head"><b>💬 Pembantu SKIPPF</b><small>Rujukan panduan dan soalan lazim — bukan chatbot AI luaran.</small></div>
+      <div id="messages" aria-live="polite"><div class="bubble">Hai. Saya boleh bantu tentang akses, dashboard, kemas kini rekod, direktori atau masalah butang Kemaskini.</div></div>
+      <form id="chat"><input id="question" autocomplete="off" placeholder="Tulis soalan anda…" aria-label="Soalan kepada Pembantu SKIPPF"><button>Hantar</button></form>
+    </section>
+    <a class="back" href="../?home=1">← Kembali ke SKIPPF</a>
+  </main>
+  <script>
+    const faq = [
+      [/akses|log.?masuk|akaun|moh|tak boleh|gagal/i, 'Gunakan akaun rasmi @moh.gov.my. Tukar daripada akaun peribadi Google, kemudian cuba semula menggunakan Chrome atau Safari terkini.'],
+      [/kemas ?kini|edit|simpan|rekod/i, 'Buka modul yang berkaitan, pilih rekod di bawah tanggungjawab anda, tekan Kemaskini dan semak nilai sebelum menyimpan.'],
+      [/butang|pic|peranan|tiada/i, 'Butang Kemaskini hanya dipaparkan mengikut peranan dan tugasan PIC. Jika rekod itu di bawah tanggungjawab anda, hubungi pentadbir SKIPPF.'],
+      [/dashboard|kpi|qap|obb|pencapaian/i, 'Buka Dashboard untuk ringkasan KPI, QAP dan OBB. Gunakan rekod terperinci untuk menyemak item yang memerlukan tindakan.'],
+      [/direktori|dokumen|muat naik|upload/i, 'Gunakan Direktori Rujukan untuk bahan kerja yang dikongsi. Muat naik hanya dokumen yang dibenarkan dan jangan masukkan maklumat sensitif ke dalam chat ini.']
+    ];
+    const messages = document.getElementById('messages');
+    function add(text, mine) { const el=document.createElement('div'); el.className='bubble'+(mine?' me':''); el.textContent=text; messages.appendChild(el); el.scrollIntoView({block:'nearest'}); }
+    document.getElementById('chat').addEventListener('submit', function(e) { e.preventDefault(); const q=document.getElementById('question'); const text=q.value.trim(); if(!text) return; add(text,true); q.value=''; const match=faq.find(x=>x[0].test(text)); add(match ? match[1] : 'Maaf, saya belum ada jawapan khusus. Cuba kata kunci akses, dashboard, kemas kini, butang atau direktori. Untuk isu rekod, hubungi pentadbir SKIPPF.'); });
+    document.getElementById('search').addEventListener('input', function() { const q=this.value.toLowerCase(); document.querySelectorAll('#faq details,.card').forEach(el=>{el.hidden=!el.textContent.toLowerCase().includes(q);}); });
+  </script>
+</body>
+</html>
