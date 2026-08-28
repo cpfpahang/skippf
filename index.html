@@ -29,8 +29,18 @@
     padding: 24px;
     text-align: center;
   }
-  .logo { width: 180px; height: 180px; border-radius: 32px; margin-bottom: 20px; }
-  h1 { font-size: 30px; letter-spacing: 2px; margin-bottom: 4px; }
+  .logo { width: 180px; height: 180px; border-radius: 32px; margin-bottom: 12px; }
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
   .sub { color: #ccc; font-size: 15px; margin-bottom: 28px; }
   .actions { display: flex; flex-direction: column; align-items: center; gap: 12px; margin-bottom: 22px; width: min(100%, 420px); }
   .btn {
@@ -152,8 +162,8 @@
 </script>
 </head>
 <body>
-  <img class="logo" src="icon-512.png" alt="Logo SKIPPF">
-  <h1>SKIPPF</h1>
+  <img class="logo" src="icon-512.png" alt="SKIPPF">
+  <h1 class="sr-only">SKIPPF</h1>
   <p class="sub">CPF Pahang</p>
   <div class="actions">
     <a class="btn" id="buka"
