@@ -10,6 +10,9 @@
 <meta property="og:description" content="Platform SKIPPF, Cawangan Penguatkuasa Farmasi Pahang. Buka dengan akaun rasmi KKM @moh.gov.my.">
 <meta property="og:image" content="https://cpfpahang.github.io/skippf/icon-512.png">
 <meta property="og:type" content="website">
+<link rel="preconnect" href="https://script.google.com" crossorigin>
+<link rel="preconnect" href="https://www.google.com">
+<link rel="dns-prefetch" href="https://script.google.com">
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icon-192.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
@@ -147,8 +150,7 @@
   function ingatAkses() {
     try { localStorage.setItem('skippf_auto', '1'); } catch (err) {}
   }
-  function bukaSkippf(e) {
-    e.preventDefault();
+  function bukaSkippf() {
     ingatAkses();
     var btn = document.getElementById('buka');
     var note = document.getElementById('loading-note');
@@ -157,18 +159,17 @@
       btn.textContent = 'Membuka SKIPPF...';
     }
     if (note) note.hidden = false;
-    setTimeout(function () { location.href = APP_URL; }, 400);
   }
 </script>
 </head>
 <body>
-  <img class="logo" src="icon-512.png" alt="SKIPPF">
+  <img class="logo" src="icon-192.png" width="180" height="180" alt="SKIPPF">
   <h1 class="sr-only">SKIPPF</h1>
   <p class="sub">CPF Pahang</p>
   <div class="actions">
     <a class="btn" id="buka"
        href="https://script.google.com/a/macros/moh.gov.my/s/AKfycbzuGb22cBZZH8QzWx8VQHx8kXdpRLSioo5WHs3L2A6YOtqUbEq5HSEz-EsELcUsqeIVig/exec"
-       onclick="bukaSkippf(event)">Buka SKIPPF &#10132;</a>
+       onclick="bukaSkippf()">Buka SKIPPF &#10132;</a>
     <a class="btn btn-secondary" href="panduan/">Panduan Penggunaan</a>
   </div>
   <p class="loading-note" id="loading-note" hidden>Ini mungkin mengambil masa beberapa saat. Gunakan akaun rasmi <strong>@moh.gov.my</strong>.</p>
