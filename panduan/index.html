@@ -4,31 +4,38 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Panduan Penggunaan | SKIPPF</title>
+  <meta name="description" content="Panduan penggunaan SKIPPF untuk staf CPF Pahang: akses, dashboard, kemas kini rekod dan direktori rujukan.">
   <meta name="theme-color" content="#000000">
+  <link rel="icon" href="../icon-192.png">
   <style>
-    :root { --red:#d82c2c; --ink:#161616; --muted:#656565; --line:#e6e6e6; }
+    :root { --red:#b71c1c; --ink:#161616; --muted:#5a5a5a; --line:#e6e6e6; }
     * { box-sizing:border-box; }
     body { margin:0; background:#f6f6f6; color:var(--ink); font:16px/1.55 "Segoe UI",Arial,sans-serif; }
     header { background:#000; color:#fff; padding:22px max(20px,calc((100% - 960px)/2)); }
-    .brand { display:flex; gap:13px; align-items:center; text-decoration:none; color:#fff; width:max-content; }
+    .brand { display:flex; gap:13px; align-items:center; text-decoration:none; color:#fff; width:max-content; min-height:44px; }
     .brand img { width:42px; height:42px; border-radius:10px; }
     .brand strong { display:block; font-size:18px; letter-spacing:1px; }
     .brand span { color:#bbb; font-size:13px; }
     main { max-width:960px; margin:auto; padding:34px 20px 72px; }
     h1 { font-size:clamp(28px,5vw,42px); line-height:1.1; margin:0 0 10px; }
-    .intro { color:var(--muted); max-width:700px; margin:0 0 24px; }
+    .intro { color:var(--muted); max-width:700px; margin:0 0 16px; }
+    .glossary { max-width:700px; margin:0 0 24px; color:var(--muted); font-size:14px; }
     .search { width:100%; border:2px solid var(--line); border-radius:12px; background:#fff; padding:15px 17px; font:inherit; outline:0; }
     .search:focus { border-color:var(--red); box-shadow:0 0 0 3px #f9dede; }
     .notice { margin:18px 0 26px; padding:13px 16px; background:#fff4f4; border-left:4px solid var(--red); border-radius:6px; font-size:14px; }
-    .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:14px; }
+    .grid { display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:14px; }
+    @media (max-width:640px) { .grid { grid-template-columns:1fr; } }
     .card, details, .bot { background:#fff; border:1px solid var(--line); border-radius:14px; }
     .card { padding:20px; }
     .card h2 { font-size:18px; margin:0 0 8px; }
     .card p { font-size:14px; margin:0; color:var(--muted); }
     h2.section { margin:34px 0 12px; font-size:22px; }
     details { margin:10px 0; overflow:hidden; }
-    summary { cursor:pointer; padding:16px 18px; font-weight:700; }
+    summary { cursor:pointer; padding:16px 18px; font-weight:700; min-height:48px; }
     details div { padding:0 18px 18px; color:#3f3f3f; }
+    .empty { display:none; margin:8px 0 18px; padding:16px 18px; background:#fff; border:1px dashed var(--line); border-radius:14px; }
+    .empty.show { display:block; }
+    .empty button { margin-top:10px; }
     .bot { margin-top:34px; overflow:hidden; }
     .bot-head { background:#171717; color:#fff; padding:16px 18px; }
     .bot-head b { display:block; }
@@ -38,24 +45,28 @@
     .bubble.me { margin-left:auto; background:#fee3e3; }
     form { border-top:1px solid var(--line); padding:12px; display:flex; gap:8px; }
     form input { min-width:0; flex:1; border:1px solid #cfcfcf; border-radius:9px; padding:11px; font:inherit; }
-    button { border:0; border-radius:9px; background:var(--red); color:#fff; font:inherit; font-weight:700; padding:10px 16px; cursor:pointer; }
-    .back { display:inline-block; color:var(--red); margin-top:26px; font-weight:700; text-decoration:none; }
+    button { border:0; border-radius:9px; background:var(--red); color:#fff; font:inherit; font-weight:700; padding:12px 16px; cursor:pointer; min-height:44px; }
+    button:disabled { opacity:.45; cursor:not-allowed; }
+    .back { display:inline-flex; align-items:center; color:var(--red); margin-top:26px; font-weight:700; text-decoration:none; min-height:44px; padding:4px 0; }
+    .back:focus-visible { outline:3px solid var(--red); outline-offset:4px; }
   </style>
 </head>
 <body>
-  <header><a class="brand" href="../?home=1"><img src="../icon-192.png" alt=""><div><strong>SKIPPF</strong><span>CPF Pahang</span></div></a></header>
+  <header><a class="brand" href="../?home=1"><img src="../icon-192.png" alt="Logo SKIPPF"><div><strong>SKIPPF</strong><span>CPF Pahang</span></div></a></header>
   <main>
     <h1>Panduan Penggunaan</h1>
     <p class="intro">Rujukan ringkas untuk menggunakan SKIPPF. Pilih topik atau tanya Pembantu SKIPPF di bawah.</p>
+    <p class="glossary"><b>KPI</b> = Indikator Prestasi Utama. <b>QAP</b> = Quality Assurance Programme. <b>OBB</b> = Outcome Based Budgeting.</p>
     <input class="search" id="search" type="search" placeholder="Cari contoh: akses, dashboard, kemas kini, dokumen" aria-label="Cari panduan">
     <p class="notice"><b>Privasi:</b> Jangan masukkan nama pegawai, rekod KPI, dokumen atau maklumat sensitif. Pembantu ini hanya menggunakan jawapan panduan yang tersedia dalam halaman ini.</p>
-    <section class="grid" aria-label="Topik utama">
+    <section class="grid" aria-label="Topik utama" id="topics">
       <article class="card"><h2>1. Akses SKIPPF</h2><p>Gunakan akaun rasmi KKM <b>@moh.gov.my</b>. Jika gagal, tukar daripada akaun peribadi dan buka semula SKIPPF.</p></article>
       <article class="card"><h2>2. Dashboard</h2><p>Gunakan dashboard untuk semak status dan pencapaian KPI, QAP serta OBB sebelum tindakan susulan dibuat.</p></article>
       <article class="card"><h2>3. Kemas kini rekod</h2><p>Pilih rekod di bawah tanggungjawab anda dan gunakan butang Kemaskini. Semak semula nilai sebelum disimpan.</p></article>
       <article class="card"><h2>4. Direktori Rujukan</h2><p>Gunakan Direktori untuk mendapatkan bahan kerja yang telah dikongsi. Muat naik hanya dokumen yang dibenarkan.</p></article>
     </section>
-    <h2 class="section">Soalan lazim</h2>
+    <h2 class="section" id="faq-heading">Soalan lazim</h2>
+    <p class="empty" id="empty">Tiada hasil. Cuba: akses, dashboard, kemas kini, direktori.<br><button type="button" id="clear-search">Kosongkan carian</button></p>
     <section id="faq">
       <details><summary>Kenapa saya tidak boleh akses SKIPPF?</summary><div>Pastikan anda menggunakan akaun rasmi <b>@moh.gov.my</b>. Tutup atau tukar akaun Google peribadi, kemudian cuba semula menggunakan Chrome atau Safari terkini.</div></details>
       <details><summary>Bagaimana saya mengemas kini rekod?</summary><div>Buka modul yang berkaitan, pilih rekod di bawah tanggungjawab anda, tekan <b>Kemaskini</b>, lengkapkan butiran yang perlu dan semak sebelum menyimpan.</div></details>
@@ -64,11 +75,11 @@
       <details><summary>Apakah yang perlu saya elakkan dalam Pembantu SKIPPF?</summary><div>Jangan kongsi maklumat pegawai, rekod prestasi, dokumen, kata laluan atau data sensitif. Pembantu ini hanya membantu dengan cara menggunakan platform.</div></details>
     </section>
     <section class="bot" aria-label="Pembantu SKIPPF">
-      <div class="bot-head"><b>💬 Pembantu SKIPPF</b><small>Rujukan panduan dan soalan lazim — bukan chatbot AI luaran.</small></div>
+      <div class="bot-head"><b>Pembantu SKIPPF</b><small>Rujukan panduan dan soalan lazim \u2014 bukan chatbot AI luaran.</small></div>
       <div id="messages" aria-live="polite"><div class="bubble">Hai. Saya boleh bantu tentang akses, dashboard, kemas kini rekod, direktori atau masalah butang Kemaskini.</div></div>
-      <form id="chat"><input id="question" autocomplete="off" placeholder="Tulis soalan anda…" aria-label="Soalan kepada Pembantu SKIPPF"><button>Hantar</button></form>
+      <form id="chat"><input id="question" autocomplete="off" placeholder="Tulis soalan anda\u2026" aria-label="Soalan kepada Pembantu SKIPPF"><button id="send" type="submit" disabled>Hantar</button></form>
     </section>
-    <a class="back" href="../?home=1">← Kembali ke SKIPPF</a>
+    <a class="back" href="../?home=1">\u2190 Kembali ke SKIPPF</a>
   </main>
   <script>
     const faq = [
@@ -79,9 +90,45 @@
       [/direktori|dokumen|muat naik|upload/i, 'Gunakan Direktori Rujukan untuk bahan kerja yang dikongsi. Muat naik hanya dokumen yang dibenarkan dan jangan masukkan maklumat sensitif ke dalam chat ini.']
     ];
     const messages = document.getElementById('messages');
+    const question = document.getElementById('question');
+    const send = document.getElementById('send');
+    const search = document.getElementById('search');
+    const empty = document.getElementById('empty');
+    const faqHeading = document.getElementById('faq-heading');
     function add(text, mine) { const el=document.createElement('div'); el.className='bubble'+(mine?' me':''); el.textContent=text; messages.appendChild(el); el.scrollIntoView({block:'nearest'}); }
-    document.getElementById('chat').addEventListener('submit', function(e) { e.preventDefault(); const q=document.getElementById('question'); const text=q.value.trim(); if(!text) return; add(text,true); q.value=''; const match=faq.find(x=>x[0].test(text)); add(match ? match[1] : 'Maaf, saya belum ada jawapan khusus. Cuba kata kunci akses, dashboard, kemas kini, butang atau direktori. Untuk isu rekod, hubungi pentadbir SKIPPF.'); });
-    document.getElementById('search').addEventListener('input', function() { const q=this.value.toLowerCase(); document.querySelectorAll('#faq details,.card').forEach(el=>{el.hidden=!el.textContent.toLowerCase().includes(q);}); });
+    function syncSend() { send.disabled = !question.value.trim(); }
+    question.addEventListener('input', syncSend);
+    document.getElementById('chat').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const text=question.value.trim();
+      if(!text) {
+        add('Cuba kata kunci: akses, dashboard, kemas kini, butang atau direktori.');
+        return;
+      }
+      add(text,true);
+      question.value='';
+      syncSend();
+      const match=faq.find(x=>x[0].test(text));
+      add(match ? match[1] : 'Maaf, saya belum ada jawapan khusus. Cuba kata kunci akses, dashboard, kemas kini, butang atau direktori. Untuk isu rekod, hubungi pentadbir SKIPPF.');
+    });
+    function filterGuide() {
+      const q=search.value.toLowerCase().trim();
+      const items=[...document.querySelectorAll('#faq details, #topics .card')];
+      let shown=0;
+      items.forEach(el => {
+        const hit=!q || el.textContent.toLowerCase().includes(q);
+        el.hidden=!hit;
+        if(hit) shown++;
+      });
+      empty.classList.toggle('show', !!q && shown===0);
+      faqHeading.hidden = !!q && shown===0;
+    }
+    search.addEventListener('input', filterGuide);
+    document.getElementById('clear-search').addEventListener('click', function() {
+      search.value='';
+      filterGuide();
+      search.focus();
+    });
   </script>
 </body>
 </html>
