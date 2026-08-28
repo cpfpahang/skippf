@@ -3,9 +3,15 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SKIPPF</title>
+<title>SKIPPF | CPF Pahang, KKM</title>
+<meta name="description" content="Platform SKIPPF, Cawangan Penguatkuasa Farmasi Pahang. Buka dengan akaun rasmi KKM @moh.gov.my.">
 <meta name="theme-color" content="#000000">
+<meta property="og:title" content="SKIPPF | CPF Pahang, KKM">
+<meta property="og:description" content="Platform SKIPPF, Cawangan Penguatkuasa Farmasi Pahang. Buka dengan akaun rasmi KKM @moh.gov.my.">
+<meta property="og:image" content="https://cpfpahang.github.io/skippf/icon-512.png">
+<meta property="og:type" content="website">
 <link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -25,68 +31,99 @@
   }
   .logo { width: 180px; height: 180px; border-radius: 32px; margin-bottom: 20px; }
   h1 { font-size: 30px; letter-spacing: 2px; margin-bottom: 4px; }
-  .sub { color: #aaa; font-size: 14px; margin-bottom: 32px; }
+  .sub { color: #ccc; font-size: 15px; margin-bottom: 28px; }
+  .actions { display: flex; flex-direction: column; align-items: center; gap: 12px; margin-bottom: 22px; width: min(100%, 420px); }
   .btn {
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     background: #d82c2c;
     color: #fff;
     text-decoration: none;
     font-size: 18px;
     font-weight: 600;
-    padding: 16px 48px;
+    padding: 16px 28px;
     border-radius: 50px;
-    margin-bottom: 40px;
+    min-height: 52px;
+    width: 100%;
     box-shadow: 0 4px 14px rgba(216,44,44,.4);
+    border: 0;
+    cursor: pointer;
+  }
+  .btn-secondary {
+    background: transparent;
+    color: #fff;
+    box-shadow: none;
+    border: 2px solid #fff;
   }
   .btn:active { transform: scale(.97); }
   .btn:focus-visible {
     outline: 3px solid #fff;
     outline-offset: 4px;
   }
+  .btn.busy { opacity: .85; pointer-events: none; }
+  .loading-note {
+    color: #ddd;
+    font-size: 15px;
+    line-height: 1.5;
+    max-width: 420px;
+    margin: -8px 0 18px;
+  }
   .access-note {
     max-width: 420px;
-    margin: -22px 0 24px;
+    margin: 0 0 16px;
     color: #ddd;
-    font-size: 14px;
+    font-size: 15px;
     line-height: 1.55;
   }
   .access-note strong { color: #fff; }
   .help {
     max-width: 420px;
-    margin: 0 0 22px;
-    color: #ccc;
-    font-size: 13.5px;
+    width: 100%;
+    margin: 0 0 18px;
+    color: #ddd;
+    font-size: 15px;
     line-height: 1.6;
+    text-align: left;
   }
   .help summary {
     color: #fff;
     cursor: pointer;
     font-weight: 700;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    list-style: none;
   }
-  .help p { margin-top: 10px; }
+  .help summary::-webkit-details-marker { display: none; }
+  .help summary::before { content: "\25b6 "; font-size: 12px; margin-right: 6px; }
+  .help[open] summary::before { content: "\25bc "; }
+  .help p { margin-top: 8px; text-align: center; }
   .guide {
     background: #141414;
     border: 1px solid #2a2a2a;
     border-radius: 12px;
-    padding: 18px 22px;
+    padding: 18px 20px;
     max-width: 420px;
-    font-size: 13.5px;
+    width: 100%;
+    font-size: 15px;
     line-height: 1.7;
-    color: #ccc;
+    color: #ddd;
     text-align: left;
   }
   .guide b { color: #fff; }
-  .guide .t { color: #d82c2c; font-weight: 700; display: block; margin-bottom: 6px; text-align: center; }
-  .guide-link {
-    display: inline-block;
-    margin-top: 14px;
-    color: #fff;
+  .guide .t { color: #ff6b6b; font-weight: 700; display: block; margin-bottom: 10px; text-align: center; }
+  .guide details { margin: 8px 0; }
+  .guide summary {
+    cursor: pointer;
     font-weight: 700;
-    text-decoration: none;
-    border-bottom: 2px solid #d82c2c;
-    padding-bottom: 2px;
+    color: #fff;
+    min-height: 40px;
+    display: flex;
+    align-items: center;
   }
-  .loading { color: #888; font-size: 14px; }
+  .guide details p { margin: 8px 0 4px; color: #ddd; }
 </style>
 <script>
   var APP_URL = 'https://script.google.com/a/macros/moh.gov.my/s/AKfycbzuGb22cBZZH8QzWx8VQHx8kXdpRLSioo5WHs3L2A6YOtqUbEq5HSEz-EsELcUsqeIVig/exec';
@@ -102,6 +139,18 @@
   function ingatAkses() {
     try { localStorage.setItem('skippf_auto', '1'); } catch (err) {}
   }
+  function bukaSkippf(e) {
+    e.preventDefault();
+    ingatAkses();
+    var btn = document.getElementById('buka');
+    var note = document.getElementById('loading-note');
+    if (btn) {
+      btn.classList.add('busy');
+      btn.textContent = 'Membuka SKIPPF\u2026';
+    }
+    if (note) note.hidden = false;
+    setTimeout(function () { location.href = APP_URL; }, 400);
+  }
 </script>
 </head>
 <body>
@@ -109,9 +158,13 @@
   <h1>SKIPPF</h1>
   <p class="sub">CPF Pahang</p>
 
-  <a class="btn"
-     href="https://script.google.com/a/macros/moh.gov.my/s/AKfycbzuGb22cBZZH8QzWx8VQHx8kXdpRLSioo5WHs3L2A6YOtqUbEq5HSEz-EsELcUsqeIVig/exec"
-     onclick="ingatAkses()">Buka SKIPPF ➜</a>
+  <div class="actions">
+    <a class="btn" id="buka"
+       href="https://script.google.com/a/macros/moh.gov.my/s/AKfycbzuGb22cBZZH8QzWx8VQHx8kXdpRLSioo5WHs3L2A6YOtqUbEq5HSEz-EsELcUsqeIVig/exec"
+       onclick="bukaSkippf(event)">Buka SKIPPF \u279c</a>
+    <a class="btn btn-secondary" href="panduan/">Panduan Penggunaan</a>
+  </div>
+  <p class="loading-note" id="loading-note" hidden>Ini mungkin mengambil masa beberapa saat. Gunakan akaun rasmi <strong>@moh.gov.my</strong>.</p>
 
   <p class="access-note">
     Sila buka menggunakan akaun rasmi KKM <strong>@moh.gov.my</strong>.
@@ -119,15 +172,20 @@
 
   <details class="help">
     <summary>Tidak boleh akses?</summary>
-    <p>Tutup akaun Google peribadi atau pilih akaun <strong>@moh.gov.my</strong>, kemudian tekan <strong>Buka SKIPPF</strong> semula. Jika masih gagal, cuba Chrome atau Safari terkini.</p>
+    <p>Tutup akaun Google peribadi atau pilih akaun <strong>@moh.gov.my</strong>, kemudian tekan <strong>Buka SKIPPF</strong> semula. Jika masih gagal, cuba Chrome atau Safari terkini. Jika akaun rasmi anda masih ditolak, hubungi pentadbir SKIPPF.</p>
   </details>
 
   <div class="guide">
-    <span class="t">📱 Simpan di Skrin Utama (sekali sahaja)</span>
-    <b>Android (Chrome):</b> Tekan menu <b>⋮</b> di atas kanan → <b>"Tambah pada Skrin utama"</b> → Tambah.<br>
-    <b>iPhone (Safari):</b> Tekan butang <b>Kongsi</b> → <b>"Add to Home Screen"</b> → Add.<br><br>
-    Selepas disimpan, tekan ikon SKIPPF di skrin utama untuk terus masuk.
-    <a class="guide-link" href="panduan/">Panduan Penggunaan & Pembantu SKIPPF →</a>
+    <span class="t">Simpan di Skrin Utama (sekali sahaja)</span>
+    <details>
+      <summary>Android (Chrome)</summary>
+      <p>Tekan menu <b>\u22ee</b> di atas kanan \u2192 <b>Tambah pada Skrin utama</b> \u2192 Tambah.</p>
+    </details>
+    <details>
+      <summary>iPhone (Safari)</summary>
+      <p>Tekan butang <b>Kongsi</b> \u2192 <b>Add to Home Screen</b> \u2192 Add.</p>
+    </details>
+    <p>Selepas disimpan, tekan ikon SKIPPF di skrin utama untuk terus masuk.</p>
   </div>
 </body>
 </html>
