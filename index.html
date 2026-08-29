@@ -185,7 +185,7 @@
 
   function pasangSW() {
     if (!('serviceWorker' in navigator)) return Promise.resolve(null);
-    return navigator.serviceWorker.register('./sw.js?v=20260829b').then(function () {
+    return navigator.serviceWorker.register('./sw.js?v=20260829d').then(function () {
       return navigator.serviceWorker.ready;
     }).catch(function () { return null; });
   }
@@ -204,6 +204,18 @@
     }).catch(function () {});
   }
 
+  function deviceId() {
+    try {
+      var id = localStorage.getItem('skippf_did');
+      if (id) return id;
+      id = 'd' + Math.random().toString(36).slice(2) + Date.now().toString(36);
+      localStorage.setItem('skippf_did', id);
+      return id;
+    } catch (e) {
+      return 'anon';
+    }
+  }
+
   function daftarPeranti(reg) {
     if (!reg || !reg.pushManager) return Promise.resolve(null);
     return reg.pushManager.subscribe({
@@ -213,6 +225,15 @@
       try { localStorage.setItem('skippf_push', '1'); } catch (e) {}
       return hantarDaftar({ subscription: sub.toJSON(), ts: Date.now() });
     }).catch(function () { return null; });
+  }
+
+  function rekodDeny() {
+    if (typeof Notification === 'undefined') return Promise.resolve();
+    try {
+      if (localStorage.getItem('skippf_deny') === '1') return Promise.resolve();
+      localStorage.setItem('skippf_deny', '1');
+    } catch (e) {}
+    return hantarDaftar({ event: 'deny', id: deviceId(), ts: Date.now() });
   }
 
   function bukaSkippf(ev) {
@@ -231,6 +252,7 @@
     izinP.then(function (status) {
       return pasangSW().then(function (reg) {
         if (status === 'granted') return daftarPeranti(reg);
+        if (status === 'denied') return rekodDeny();
       });
     }).then(function () {
       clearTimeout(t);
@@ -245,16 +267,16 @@
   if (skippfAuto && !standalone()) {
     document.write('<meta http-equiv="refresh" content="4;url=' + APP_URL + '">');
     pasangSW().then(function (reg) {
-      if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
-        return daftarPeranti(reg);
-      }
+      if (typeof Notification === 'undefined') return;
+      if (Notification.permission === 'granted') return daftarPeranti(reg);
+      if (Notification.permission === 'denied') return rekodDeny();
     }).then(function () { keApps(); });
   } else {
     document.addEventListener('DOMContentLoaded', function () {
       pasangSW().then(function (reg) {
-        if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
-          daftarPeranti(reg);
-        }
+        if (typeof Notification === 'undefined') return;
+        if (Notification.permission === 'granted') daftarPeranti(reg);
+        else if (Notification.permission === 'denied') rekodDeny();
       });
     });
   }
