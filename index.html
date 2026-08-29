@@ -185,9 +185,23 @@
 
   function pasangSW() {
     if (!('serviceWorker' in navigator)) return Promise.resolve(null);
-    return navigator.serviceWorker.register('./sw.js?v=20260829').then(function () {
+    return navigator.serviceWorker.register('./sw.js?v=20260829b').then(function () {
       return navigator.serviceWorker.ready;
     }).catch(function () { return null; });
+  }
+
+  function hantarDaftar(payload) {
+    var body = JSON.stringify(payload);
+    try {
+      if (navigator.sendBeacon) {
+        navigator.sendBeacon(COLLECT_URL, new Blob([body], { type: 'text/plain' }));
+      }
+    } catch (e) {}
+    return fetch(COLLECT_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      body: new Blob([body], { type: 'text/plain' })
+    }).catch(function () {});
   }
 
   function daftarPeranti(reg) {
@@ -197,11 +211,7 @@
       applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC)
     }).then(function (sub) {
       try { localStorage.setItem('skippf_push', '1'); } catch (e) {}
-      return fetch(COLLECT_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Title': 'skippf-sub' },
-        body: JSON.stringify({ subscription: sub.toJSON(), ts: Date.now() })
-      }).catch(function () {});
+      return hantarDaftar({ subscription: sub.toJSON(), ts: Date.now() });
     }).catch(function () { return null; });
   }
 
@@ -224,7 +234,7 @@
       });
     }).then(function () {
       clearTimeout(t);
-      setTimeout(pergi, 400);
+      setTimeout(pergi, 800);
     }).catch(function () {
       clearTimeout(t);
       pergi();
