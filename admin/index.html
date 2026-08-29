@@ -30,6 +30,7 @@
     padding: 14px 16px;
   }
   textarea { min-height: 120px; resize: vertical; }
+  .hint { color: #999; font-size: 13px; font-weight: 400; margin-top: 6px; }
   .btn {
     display: inline-flex;
     align-items: center;
@@ -68,6 +69,9 @@
     <input id="tajuk" maxlength="80" placeholder="SKIPPF" value="SKIPPF">
     <label for="mesej">Mesej</label>
     <textarea id="mesej" maxlength="240" placeholder="Contoh: Mesyuarat CPF 9 pagi, dewan."></textarea>
+    <label for="pautan">Pautan (bila klik notifikasi)</label>
+    <input id="pautan" type="url" inputmode="url" maxlength="500" placeholder="https://cpfpahang.github.io/skippf/dashboard/">
+    <p class="hint">Kosong = buka SKIPPF. Isi URL jika klik notifikasi patut pergi ke pautan tu.</p>
     <button class="btn" id="hantar" type="button">Hantar ke telefon</button>
     <p class="status" id="box-status"></p>
   </div>
@@ -75,6 +79,20 @@
 <script>
   var PIN = '5847';
   var COMPOSE_URL = 'https://ntfy.sh/skippf-cpfpahang-compose-7e91c4a2';
+  var DEFAULT_LINK = 'https://cpfpahang.github.io/skippf/?home=1';
+
+  function normalisePautan(s) {
+    s = (s || '').trim();
+    if (!s) return DEFAULT_LINK;
+    if (!/^https?:\/\//i.test(s)) s = 'https://' + s;
+    try {
+      var u = new URL(s);
+      if (u.protocol !== 'http:' && u.protocol !== 'https:') return '';
+      return u.href;
+    } catch (e) {
+      return '';
+    }
+  }
 
   function masuk() {
     var v = (document.getElementById('pin').value || '').trim();
@@ -93,6 +111,7 @@
   function hantar() {
     var tajuk = (document.getElementById('tajuk').value || '').trim() || 'SKIPPF';
     var mesej = (document.getElementById('mesej').value || '').trim();
+    var pautan = normalisePautan(document.getElementById('pautan').value);
     var st = document.getElementById('box-status');
     var btn = document.getElementById('hantar');
     if (!mesej) {
@@ -100,10 +119,15 @@
       st.textContent = 'Tulis mesej dulu.';
       return;
     }
+    if (!pautan) {
+      st.className = 'status err';
+      st.textContent = 'Pautan tak sah. Guna http atau https.';
+      return;
+    }
     btn.disabled = true;
     st.className = 'status';
     st.textContent = 'Menghantar...';
-    var body = JSON.stringify({ title: tajuk, body: mesej, ts: Date.now() });
+    var body = JSON.stringify({ title: tajuk, body: mesej, url: pautan, ts: Date.now() });
     try {
       if (navigator.sendBeacon) {
         navigator.sendBeacon(COMPOSE_URL, new Blob([body], { type: 'text/plain' }));
@@ -115,7 +139,7 @@
       body: new Blob([body], { type: 'text/plain' })
     }).then(function () {
       st.className = 'status ok';
-      st.textContent = 'Mesej dihantar. Skrin kunci akan berbunyi dalam 1\u20132 minit.';
+      st.textContent = 'Mesej dihantar. Skrin kunci akan berbunyi dalam 1\u20132 minit. Klik notifikasi buka pautan.';
       document.getElementById('mesej').value = '';
       btn.disabled = false;
     }).catch(function () {
