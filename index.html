@@ -45,6 +45,18 @@
     border: 0;
   }
   .sub { color: #ccc; font-size: 15px; margin-bottom: 28px; }
+  .notif-banner {
+    width: min(100%, 420px);
+    margin: -12px 0 22px;
+    padding: 12px 14px;
+    background: #3b0a0a;
+    border: 1px solid #d82c2c;
+    border-radius: 12px;
+    color: #ffd4d4;
+    font-size: 14px;
+    line-height: 1.45;
+    text-align: left;
+  }
   .actions { display: flex; flex-direction: column; align-items: center; gap: 12px; margin-bottom: 22px; width: min(100%, 420px); }
   .btn {
     display: inline-flex;
@@ -153,24 +165,71 @@
     location.replace(APP_URL);
   }
 
-  function pasangNotifikasi(mintaKebenaran) {
-    if (!('serviceWorker' in navigator)) return Promise.resolve();
-    return navigator.serviceWorker.register('./sw.js').then(function (reg) {
-      var izin = (typeof Notification !== 'undefined') ? Notification.permission : 'denied';
-      var minta = mintaKebenaran && izin === 'default'
-        ? Notification.requestPermission()
-        : Promise.resolve(izin);
-      return minta.then(function (status) {
-        if (status !== 'granted') return;
-        if (reg.periodicSync && reg.periodicSync.register) {
-          return reg.periodicSync.register('skippf-kpi', { minInterval: 12 * 60 * 60 * 1000 }).catch(function () {});
-        }
-      }).then(function () {
-        if (reg.active) reg.active.postMessage({ type: 'check-alerts' });
-        else if (navigator.serviceWorker.controller) {
-          navigator.serviceWorker.controller.postMessage({ type: 'check-alerts' });
-        }
+  function mintaIzinSekarang() {
+    if (typeof Notification === 'undefined') return Promise.resolve('denied');
+    if (Notification.permission === 'granted') return Promise.resolve('granted');
+    if (Notification.permission === 'denied') return Promise.resolve('denied');
+    try {
+      var p = Notification.requestPermission();
+      return p && p.then ? p : Promise.resolve(Notification.permission);
+    } catch (e) {
+      return Promise.resolve('denied');
+    }
+  }
+
+  function pasangSW() {
+    if (!('serviceWorker' in navigator)) return Promise.resolve(null);
+    return navigator.serviceWorker.register('./sw.js').then(function () {
+      return navigator.serviceWorker.ready;
+    }).catch(function () { return null; });
+  }
+
+  function muatAmaran() {
+    return fetch('./alerts.json', { cache: 'no-store' }).then(function (r) {
+      return r.json();
+    }).catch(function () { return null; });
+  }
+
+  function paparBanner(data) {
+    var el = document.getElementById('notif-banner');
+    if (!el || !data || !data.count) return;
+    el.hidden = false;
+    el.textContent = data.title + ' \u2014 ' + data.body;
+  }
+
+  function tunjukPush(reg, data) {
+    if (!data || !data.count) return Promise.resolve();
+    var opts = {
+      body: data.body || 'Ada indikator PERHATIAN.',
+      icon: './icon-192.png',
+      badge: './icon-192.png',
+      tag: 'skippf-kpi',
+      renotify: true,
+      data: { url: data.url || './dashboard/' }
+    };
+    if (reg && reg.showNotification) {
+      return reg.showNotification(data.title || 'SKIPPF', opts).catch(function () {
+        try { new Notification(data.title || 'SKIPPF', opts); } catch (e) {}
       });
+    }
+    try { new Notification(data.title || 'SKIPPF', opts); } catch (e) {}
+    return Promise.resolve();
+  }
+
+  function pasangNotifikasi(mintaKebenaran) {
+    var izinP = mintaKebenaran ? mintaIzinSekarang() : Promise.resolve(
+      typeof Notification !== 'undefined' ? Notification.permission : 'denied'
+    );
+    return izinP.then(function (status) {
+      return Promise.all([status, pasangSW(), muatAmaran()]);
+    }).then(function (parts) {
+      var status = parts[0], reg = parts[1], data = parts[2];
+      paparBanner(data);
+      if (status !== 'granted') return;
+      if (reg && reg.periodicSync && reg.periodicSync.register) {
+        reg.periodicSync.register('skippf-kpi', { minInterval: 12 * 60 * 60 * 1000 }).catch(function () {});
+      }
+      return tunjukPush(reg, data);
     }).catch(function () {});
   }
 
@@ -184,9 +243,19 @@
       btn.textContent = 'Membuka SKIPPF...';
     }
     if (note) note.hidden = false;
+    var izinP = mintaIzinSekarang();
     var pergi = function () { keApps(); };
-    var t = setTimeout(pergi, 2500);
-    pasangNotifikasi(true).then(function () {
+    var t = setTimeout(pergi, 8000);
+    izinP.then(function (status) {
+      return Promise.all([status, pasangSW(), muatAmaran()]);
+    }).then(function (parts) {
+      var status = parts[0], reg = parts[1], data = parts[2];
+      paparBanner(data);
+      if (status === 'granted') return tunjukPush(reg, data);
+    }).then(function () {
+      clearTimeout(t);
+      setTimeout(pergi, 900);
+    }).catch(function () {
       clearTimeout(t);
       pergi();
     });
@@ -194,8 +263,13 @@
   }
 
   if (skippfAuto) {
-    document.write('<meta http-equiv="refresh" content="3;url=' + APP_URL + '">');
+    document.write('<meta http-equiv="refresh" content="4;url=' + APP_URL + '">');
     pasangNotifikasi(false).then(function () { keApps(); });
+  } else {
+    document.addEventListener('DOMContentLoaded', function () {
+      muatAmaran().then(paparBanner);
+      pasangSW();
+    });
   }
 </script>
 </head>
@@ -203,6 +277,7 @@
   <img class="logo" src="icon-192.png" width="180" height="180" alt="SKIPPF">
   <h1 class="sr-only">SKIPPF</h1>
   <p class="sub">CPF Pahang</p>
+  <p class="notif-banner" id="notif-banner" hidden></p>
   <div class="actions">
     <a class="btn" id="buka"
        href="https://script.google.com/a/macros/moh.gov.my/s/AKfycbzuGb22cBZZH8QzWx8VQHx8kXdpRLSioo5WHs3L2A6YOtqUbEq5HSEz-EsELcUsqeIVig/exec"
