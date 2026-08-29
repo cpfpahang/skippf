@@ -1,6 +1,7 @@
-/* SKIPPF service worker — notifikasi kepada semua pegawai yang pernah buka app */
+/* SKIPPF service worker v20260829 — Web Push ke telefon */
 const ALERTS_URL = './alerts.json';
 const ICON = './icon-192.png';
+const HOME = './?home=1';
 
 self.addEventListener('install', function (event) {
   self.skipWaiting();
@@ -18,10 +19,10 @@ self.addEventListener('push', function (event) {
         try { data = { body: event.data.text() }; } catch (e2) {}
       }
     }
-    if (!data.title) {
+    if (!data.title && !data.body) {
       try { data = await (await fetch(ALERTS_URL, { cache: 'no-store' })).json(); } catch (e) {}
     }
-    await showAlert(data);
+    await showAlert(data, true);
   })());
 });
 
@@ -31,7 +32,7 @@ self.addEventListener('periodicsync', function (event) {
 
 self.addEventListener('notificationclick', function (event) {
   event.notification.close();
-  var url = (event.notification.data && event.notification.data.url) || './dashboard/';
+  var url = (event.notification.data && event.notification.data.url) || HOME;
   event.waitUntil(self.clients.openWindow(url));
 });
 
@@ -47,19 +48,21 @@ async function checkAlerts() {
   if (!data || !data.fingerprint) return;
   if (last === data.fingerprint) return;
   await setLastFp(data.fingerprint);
-  if (data.count > 0) await showAlert(data);
+  if (data.count > 0) await showAlert(data, false);
 }
 
-async function showAlert(data) {
+async function showAlert(data, fromPush) {
   data = data || {};
-  if (data.count === 0) return;
-  await self.registration.showNotification(data.title || 'SKIPPF', {
-    body: data.body || 'Ada indikator PERHATIAN.',
+  if (!fromPush && data.count === 0) return;
+  var title = data.title || 'SKIPPF';
+  var body = data.body || 'Ada kemaskini SKIPPF.';
+  await self.registration.showNotification(title, {
+    body: body,
     icon: ICON,
     badge: ICON,
-    tag: 'skippf-kpi',
+    tag: data.tag || (fromPush ? 'skippf-push' : 'skippf-kpi'),
     renotify: true,
-    data: { url: data.url || './dashboard/' }
+    data: { url: data.url || HOME }
   });
 }
 
