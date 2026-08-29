@@ -1,0 +1,31 @@
+name: SKIPPF alerts
+
+on:
+  schedule:
+    - cron: "0 0 * * 1-5"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Bina alerts.json
+        run: python scripts/build_alerts.py
+      - name: Commit jika berubah
+        run: |
+          git config user.name "skippf-alerts"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add alerts.json
+          if git diff --staged --quiet; then
+            echo "Tiada perubahan"
+            exit 0
+          fi
+          git commit -m "Kemas kini amaran KPI SKIPPF"
+          git push
