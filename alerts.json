@@ -1,0 +1,32 @@
+{
+  "updated": "2026-08-29T00:00:59Z",
+  "threshold": 58,
+  "count": 3,
+  "fingerprint": "OP8-1:53.7|OP12-1:33.3|OP14-1:57.1",
+  "title": "SKIPPF: 3 indikator PERHATIAN",
+  "body": "OP8-1 54% · OP12-1 33% · OP14-1 57%",
+  "url": "https://cpfpahang.github.io/skippf/dashboard/",
+  "items": [
+    {
+      "id": "OP8-1",
+      "nama": "Bilangan kertas penyiasatan yang diselesaikan",
+      "pic": "HAFIZAH",
+      "pct": 53.7,
+      "bahagian": "OUTPUT"
+    },
+    {
+      "id": "OP12-1",
+      "nama": "Operasi khas ke atas bahan terkawal farmaseutikal",
+      "pic": "SHAIFUL",
+      "pct": 33.3,
+      "bahagian": "OUTPUT"
+    },
+    {
+      "id": "OP14-1",
+      "nama": "Penyediaan laporan pemprofilan daripada inteligens siber",
+      "pic": "HAFRIZAN",
+      "pct": 57.1,
+      "bahagian": "OUTPUT"
+    }
+  ]
+}

@@ -143,14 +143,39 @@
   var forceHome = new URLSearchParams(window.location.search).has('home');
   var autoMasuk = false;
   try { autoMasuk = localStorage.getItem('skippf_auto') === '1'; } catch (err) {}
-  if (!forceHome && autoMasuk) {
-    document.write('<meta http-equiv="refresh" content="0;url=' + APP_URL + '">');
-    location.replace(APP_URL);
-  }
+  var skippfAuto = !forceHome && autoMasuk;
+
   function ingatAkses() {
     try { localStorage.setItem('skippf_auto', '1'); } catch (err) {}
   }
-  function bukaSkippf() {
+
+  function keApps() {
+    location.replace(APP_URL);
+  }
+
+  function pasangNotifikasi(mintaKebenaran) {
+    if (!('serviceWorker' in navigator)) return Promise.resolve();
+    return navigator.serviceWorker.register('./sw.js').then(function (reg) {
+      var izin = (typeof Notification !== 'undefined') ? Notification.permission : 'denied';
+      var minta = mintaKebenaran && izin === 'default'
+        ? Notification.requestPermission()
+        : Promise.resolve(izin);
+      return minta.then(function (status) {
+        if (status !== 'granted') return;
+        if (reg.periodicSync && reg.periodicSync.register) {
+          return reg.periodicSync.register('skippf-kpi', { minInterval: 12 * 60 * 60 * 1000 }).catch(function () {});
+        }
+      }).then(function () {
+        if (reg.active) reg.active.postMessage({ type: 'check-alerts' });
+        else if (navigator.serviceWorker.controller) {
+          navigator.serviceWorker.controller.postMessage({ type: 'check-alerts' });
+        }
+      });
+    }).catch(function () {});
+  }
+
+  function bukaSkippf(ev) {
+    if (ev) ev.preventDefault();
     ingatAkses();
     var btn = document.getElementById('buka');
     var note = document.getElementById('loading-note');
@@ -159,6 +184,18 @@
       btn.textContent = 'Membuka SKIPPF...';
     }
     if (note) note.hidden = false;
+    var pergi = function () { keApps(); };
+    var t = setTimeout(pergi, 2500);
+    pasangNotifikasi(true).then(function () {
+      clearTimeout(t);
+      pergi();
+    });
+    return false;
+  }
+
+  if (skippfAuto) {
+    document.write('<meta http-equiv="refresh" content="3;url=' + APP_URL + '">');
+    pasangNotifikasi(false).then(function () { keApps(); });
   }
 </script>
 </head>
@@ -169,7 +206,7 @@
   <div class="actions">
     <a class="btn" id="buka"
        href="https://script.google.com/a/macros/moh.gov.my/s/AKfycbzuGb22cBZZH8QzWx8VQHx8kXdpRLSioo5WHs3L2A6YOtqUbEq5HSEz-EsELcUsqeIVig/exec"
-       onclick="bukaSkippf()">Buka SKIPPF &#10132;</a>
+       onclick="return bukaSkippf(event)">Buka SKIPPF &#10132;</a>
     <a class="btn btn-secondary" href="panduan/">Panduan Penggunaan</a>
   </div>
   <p class="loading-note" id="loading-note" hidden>Ini mungkin mengambil masa beberapa saat. Gunakan akaun rasmi <strong>@moh.gov.my</strong>.</p>
