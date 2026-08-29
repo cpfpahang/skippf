@@ -45,18 +45,6 @@
     border: 0;
   }
   .sub { color: #ccc; font-size: 15px; margin-bottom: 28px; }
-  .notif-banner {
-    width: min(100%, 420px);
-    margin: -12px 0 22px;
-    padding: 12px 14px;
-    background: #3b0a0a;
-    border: 1px solid #d82c2c;
-    border-radius: 12px;
-    color: #ffd4d4;
-    font-size: 14px;
-    line-height: 1.45;
-    text-align: left;
-  }
   .actions { display: flex; flex-direction: column; align-items: center; gap: 12px; margin-bottom: 22px; width: min(100%, 420px); }
   .btn {
     display: inline-flex;
@@ -157,11 +145,19 @@
   try { autoMasuk = localStorage.getItem('skippf_auto') === '1'; } catch (err) {}
   var skippfAuto = !forceHome && autoMasuk;
 
+  function standalone() {
+    return window.matchMedia('(display-mode: standalone)').matches || !!window.navigator.standalone;
+  }
+
   function ingatAkses() {
     try { localStorage.setItem('skippf_auto', '1'); } catch (err) {}
   }
 
   function keApps() {
+    if (standalone()) {
+      window.open(APP_URL, '_blank');
+      return;
+    }
     location.replace(APP_URL);
   }
 
@@ -190,17 +186,10 @@
     }).catch(function () { return null; });
   }
 
-  function paparBanner(data) {
-    var el = document.getElementById('notif-banner');
-    if (!el || !data || !data.count) return;
-    el.hidden = false;
-    el.textContent = data.title + ' \u2014 ' + data.body;
-  }
-
-  function tunjukPush(reg, data) {
+  function tunjukPushPhone(reg, data) {
     if (!data || !data.count) return Promise.resolve();
     var opts = {
-      body: data.body || 'Ada indikator PERHATIAN.',
+      body: data.body || 'Ada kemaskini SKIPPF.',
       icon: './icon-192.png',
       badge: './icon-192.png',
       tag: 'skippf-kpi',
@@ -208,29 +197,9 @@
       data: { url: data.url || './dashboard/' }
     };
     if (reg && reg.showNotification) {
-      return reg.showNotification(data.title || 'SKIPPF', opts).catch(function () {
-        try { new Notification(data.title || 'SKIPPF', opts); } catch (e) {}
-      });
+      return reg.showNotification(data.title || 'SKIPPF', opts);
     }
-    try { new Notification(data.title || 'SKIPPF', opts); } catch (e) {}
     return Promise.resolve();
-  }
-
-  function pasangNotifikasi(mintaKebenaran) {
-    var izinP = mintaKebenaran ? mintaIzinSekarang() : Promise.resolve(
-      typeof Notification !== 'undefined' ? Notification.permission : 'denied'
-    );
-    return izinP.then(function (status) {
-      return Promise.all([status, pasangSW(), muatAmaran()]);
-    }).then(function (parts) {
-      var status = parts[0], reg = parts[1], data = parts[2];
-      paparBanner(data);
-      if (status !== 'granted') return;
-      if (reg && reg.periodicSync && reg.periodicSync.register) {
-        reg.periodicSync.register('skippf-kpi', { minInterval: 12 * 60 * 60 * 1000 }).catch(function () {});
-      }
-      return tunjukPush(reg, data);
-    }).catch(function () {});
   }
 
   function bukaSkippf(ev) {
@@ -250,11 +219,10 @@
       return Promise.all([status, pasangSW(), muatAmaran()]);
     }).then(function (parts) {
       var status = parts[0], reg = parts[1], data = parts[2];
-      paparBanner(data);
-      if (status === 'granted') return tunjukPush(reg, data);
+      if (status === 'granted') return tunjukPushPhone(reg, data);
     }).then(function () {
       clearTimeout(t);
-      setTimeout(pergi, 900);
+      setTimeout(pergi, 600);
     }).catch(function () {
       clearTimeout(t);
       pergi();
@@ -262,14 +230,17 @@
     return false;
   }
 
-  if (skippfAuto) {
+  if (skippfAuto && !standalone()) {
     document.write('<meta http-equiv="refresh" content="4;url=' + APP_URL + '">');
-    pasangNotifikasi(false).then(function () { keApps(); });
+    pasangSW().then(function (reg) {
+      return muatAmaran().then(function (data) {
+        if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
+          return tunjukPushPhone(reg, data);
+        }
+      });
+    }).then(function () { keApps(); });
   } else {
-    document.addEventListener('DOMContentLoaded', function () {
-      muatAmaran().then(paparBanner);
-      pasangSW();
-    });
+    document.addEventListener('DOMContentLoaded', function () { pasangSW(); });
   }
 </script>
 </head>
@@ -277,7 +248,6 @@
   <img class="logo" src="icon-192.png" width="180" height="180" alt="SKIPPF">
   <h1 class="sr-only">SKIPPF</h1>
   <p class="sub">CPF Pahang</p>
-  <p class="notif-banner" id="notif-banner" hidden></p>
   <div class="actions">
     <a class="btn" id="buka"
        href="https://script.google.com/a/macros/moh.gov.my/s/AKfycbzuGb22cBZZH8QzWx8VQHx8kXdpRLSioo5WHs3L2A6YOtqUbEq5HSEz-EsELcUsqeIVig/exec"
