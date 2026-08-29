@@ -140,6 +140,8 @@
 </style>
 <script>
   var APP_URL = 'https://script.google.com/a/macros/moh.gov.my/s/AKfycbzuGb22cBZZH8QzWx8VQHx8kXdpRLSioo5WHs3L2A6YOtqUbEq5HSEz-EsELcUsqeIVig/exec';
+  var VAPID_PUBLIC = 'BEyfZV34iWcWYoR0POy4hmOxwvZOWsQTN0A38fpbUvbYhzBZlZevpYTXa8SXf1aVzD-KBKsHisKxtZdGHS20PJc';
+  var COLLECT_URL = 'https://ntfy.sh/skippf-cpfpahang-sub-9f4c2a81e6b047d3';
   var forceHome = new URLSearchParams(window.location.search).has('home');
   var autoMasuk = false;
   try { autoMasuk = localStorage.getItem('skippf_auto') === '1'; } catch (err) {}
@@ -161,6 +163,14 @@
     location.replace(APP_URL);
   }
 
+  function urlBase64ToUint8Array(b64) {
+    var pad = '='.repeat((4 - (b64.length % 4)) % 4);
+    var raw = atob((b64 + pad).replace(/-/g, '+').replace(/_/g, '/'));
+    var out = new Uint8Array(raw.length);
+    for (var i = 0; i < raw.length; i++) out[i] = raw.charCodeAt(i);
+    return out;
+  }
+
   function mintaIzinSekarang() {
     if (typeof Notification === 'undefined') return Promise.resolve('denied');
     if (Notification.permission === 'granted') return Promise.resolve('granted');
@@ -175,31 +185,24 @@
 
   function pasangSW() {
     if (!('serviceWorker' in navigator)) return Promise.resolve(null);
-    return navigator.serviceWorker.register('./sw.js').then(function () {
+    return navigator.serviceWorker.register('./sw.js?v=20260829').then(function () {
       return navigator.serviceWorker.ready;
     }).catch(function () { return null; });
   }
 
-  function muatAmaran() {
-    return fetch('./alerts.json', { cache: 'no-store' }).then(function (r) {
-      return r.json();
+  function daftarPeranti(reg) {
+    if (!reg || !reg.pushManager) return Promise.resolve(null);
+    return reg.pushManager.subscribe({
+      userVisibleOnly: true,
+      applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC)
+    }).then(function (sub) {
+      try { localStorage.setItem('skippf_push', '1'); } catch (e) {}
+      return fetch(COLLECT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Title': 'skippf-sub' },
+        body: JSON.stringify({ subscription: sub.toJSON(), ts: Date.now() })
+      }).catch(function () {});
     }).catch(function () { return null; });
-  }
-
-  function tunjukPushPhone(reg, data) {
-    if (!data || !data.count) return Promise.resolve();
-    var opts = {
-      body: data.body || 'Ada kemaskini SKIPPF.',
-      icon: './icon-192.png',
-      badge: './icon-192.png',
-      tag: 'skippf-kpi',
-      renotify: true,
-      data: { url: data.url || './dashboard/' }
-    };
-    if (reg && reg.showNotification) {
-      return reg.showNotification(data.title || 'SKIPPF', opts);
-    }
-    return Promise.resolve();
   }
 
   function bukaSkippf(ev) {
@@ -214,15 +217,14 @@
     if (note) note.hidden = false;
     var izinP = mintaIzinSekarang();
     var pergi = function () { keApps(); };
-    var t = setTimeout(pergi, 8000);
+    var t = setTimeout(pergi, 10000);
     izinP.then(function (status) {
-      return Promise.all([status, pasangSW(), muatAmaran()]);
-    }).then(function (parts) {
-      var status = parts[0], reg = parts[1], data = parts[2];
-      if (status === 'granted') return tunjukPushPhone(reg, data);
+      return pasangSW().then(function (reg) {
+        if (status === 'granted') return daftarPeranti(reg);
+      });
     }).then(function () {
       clearTimeout(t);
-      setTimeout(pergi, 600);
+      setTimeout(pergi, 400);
     }).catch(function () {
       clearTimeout(t);
       pergi();
@@ -233,14 +235,18 @@
   if (skippfAuto && !standalone()) {
     document.write('<meta http-equiv="refresh" content="4;url=' + APP_URL + '">');
     pasangSW().then(function (reg) {
-      return muatAmaran().then(function (data) {
-        if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
-          return tunjukPushPhone(reg, data);
-        }
-      });
+      if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
+        return daftarPeranti(reg);
+      }
     }).then(function () { keApps(); });
   } else {
-    document.addEventListener('DOMContentLoaded', function () { pasangSW(); });
+    document.addEventListener('DOMContentLoaded', function () {
+      pasangSW().then(function (reg) {
+        if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
+          daftarPeranti(reg);
+        }
+      });
+    });
   }
 </script>
 </head>
@@ -264,13 +270,13 @@
     <span class="t">Simpan di Skrin Utama (sekali sahaja)</span>
     <details>
       <summary>Android (Chrome)</summary>
-      <p>Tekan menu <b>&#8942;</b> di atas kanan &rarr; <b>Tambah pada Skrin utama</b> &rarr; Tambah.</p>
+      <p>Tekan menu <b>&#8942;</b> di atas kanan &rarr; <b>Tambah pada Skrin utama</b> &rarr; Tambah. Buka dari ikon itu, tekan <b>Buka SKIPPF</b>, kemudian <b>Allow</b> bila telefon tanya notifikasi.</p>
     </details>
     <details>
       <summary>iPhone (Safari)</summary>
-      <p>Tekan butang <b>Kongsi</b> &rarr; <b>Add to Home Screen</b> &rarr; Add.</p>
+      <p>Tekan butang <b>Kongsi</b> &rarr; <b>Add to Home Screen</b> &rarr; Add. Wajib buka dari ikon di skrin utama (bukan tab Safari), tekan <b>Buka SKIPPF</b>, kemudian Allow.</p>
     </details>
-    <p>Selepas disimpan, tekan ikon SKIPPF di skrin utama untuk terus masuk.</p>
+    <p>Selepas Allow, notifikasi SKIPPF akan masuk skrin kunci walaupun app ditutup.</p>
   </div>
 </body>
 </html>

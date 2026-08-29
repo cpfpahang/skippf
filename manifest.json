@@ -2,11 +2,12 @@
   "name": "SKIPPF - CPF Pahang",
   "short_name": "SKIPPF",
   "description": "Platform SKIPPF, Cawangan Penguatkuasa Farmasi Pahang",
-  "start_url": "./index.html",
+  "start_url": "./?home=1",
   "scope": "./",
   "display": "standalone",
   "background_color": "#000000",
   "theme_color": "#000000",
+  "gcm_sender_id": "103953800507",
   "icons": [
     {
       "src": "icon-192.png",
