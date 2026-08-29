@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin push | SKIPPF</title>
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#000000">
+<link rel="icon" href="../icon-192.png">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #000;
+    color: #fff;
+    min-height: 100vh;
+    padding: 28px 20px 64px;
+  }
+  main { max-width: 420px; margin: 0 auto; }
+  h1 { font-size: 24px; margin: 0 0 8px; }
+  .sub { color: #ccc; margin-bottom: 22px; font-size: 15px; }
+  label { display: block; font-weight: 700; margin: 14px 0 6px; }
+  input, textarea {
+    width: 100%;
+    border: 1px solid #333;
+    border-radius: 12px;
+    background: #141414;
+    color: #fff;
+    font: 16px/1.4 'Segoe UI', Arial, sans-serif;
+    padding: 14px 16px;
+  }
+  textarea { min-height: 120px; resize: vertical; }
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    margin-top: 18px;
+    background: #d82c2c;
+    color: #fff;
+    border: 0;
+    border-radius: 50px;
+    min-height: 52px;
+    font-size: 18px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .btn:disabled { opacity: .7; }
+  .status { margin-top: 14px; color: #ddd; min-height: 24px; font-size: 15px; }
+  .ok { color: #8f8; }
+  .err { color: #ff8a8a; }
+</style>
+</head>
+<body>
+<main>
+  <div id="gate">
+    <h1>Admin SKIPPF</h1>
+    <p class="sub">Masukkan PIN untuk hantar push ke telefon pegawai.</p>
+    <label for="pin">PIN</label>
+    <input id="pin" type="password" inputmode="numeric" maxlength="8" autocomplete="off">
+    <button class="btn" id="buka" type="button">Masuk</button>
+    <p class="status" id="gate-status"></p>
+  </div>
+  <div id="box" hidden>
+    <h1>Hantar push</h1>
+    <p class="sub">Mesej ni masuk skrin kunci telefon yang dah Allow. Pegawai biasa tak nampak halaman ni.</p>
+    <label for="tajuk">Tajuk</label>
+    <input id="tajuk" maxlength="80" placeholder="SKIPPF" value="SKIPPF">
+    <label for="mesej">Mesej</label>
+    <textarea id="mesej" maxlength="240" placeholder="Contoh: Mesyuarat CPF 9 pagi, dewan."></textarea>
+    <button class="btn" id="hantar" type="button">Hantar ke telefon</button>
+    <p class="status" id="box-status"></p>
+  </div>
+</main>
+<script>
+  var PIN = '5847';
+  var COMPOSE_URL = 'https://ntfy.sh/skippf-cpfpahang-compose-7e91c4a2';
+
+  function masuk() {
+    var v = (document.getElementById('pin').value || '').trim();
+    var st = document.getElementById('gate-status');
+    if (v !== PIN) {
+      st.className = 'status err';
+      st.textContent = 'PIN salah.';
+      return;
+    }
+    try { sessionStorage.setItem('skippf_admin', '1'); } catch (e) {}
+    document.getElementById('gate').hidden = true;
+    document.getElementById('box').hidden = false;
+    document.getElementById('mesej').focus();
+  }
+
+  function hantar() {
+    var tajuk = (document.getElementById('tajuk').value || '').trim() || 'SKIPPF';
+    var mesej = (document.getElementById('mesej').value || '').trim();
+    var st = document.getElementById('box-status');
+    var btn = document.getElementById('hantar');
+    if (!mesej) {
+      st.className = 'status err';
+      st.textContent = 'Tulis mesej dulu.';
+      return;
+    }
+    btn.disabled = true;
+    st.className = 'status';
+    st.textContent = 'Menghantar...';
+    var body = JSON.stringify({ title: tajuk, body: mesej, ts: Date.now() });
+    try {
+      if (navigator.sendBeacon) {
+        navigator.sendBeacon(COMPOSE_URL, new Blob([body], { type: 'text/plain' }));
+      }
+    } catch (e) {}
+    fetch(COMPOSE_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      body: new Blob([body], { type: 'text/plain' })
+    }).then(function () {
+      st.className = 'status ok';
+      st.textContent = 'Mesej dihantar. Skrin kunci akan berbunyi dalam 1\u20132 minit.';
+      document.getElementById('mesej').value = '';
+      btn.disabled = false;
+    }).catch(function () {
+      st.className = 'status err';
+      st.textContent = 'Gagal hantar. Cuba lagi, atau taip mesej kat bot.';
+      btn.disabled = false;
+    });
+  }
+
+  document.getElementById('buka').addEventListener('click', masuk);
+  document.getElementById('pin').addEventListener('keydown', function (e) {
+    if (e.key === 'Enter') masuk();
+  });
+  document.getElementById('hantar').addEventListener('click', hantar);
+  try {
+    if (sessionStorage.getItem('skippf_admin') === '1') {
+      document.getElementById('gate').hidden = true;
+      document.getElementById('box').hidden = false;
+    }
+  } catch (e) {}
+</script>
+</body>
+</html>

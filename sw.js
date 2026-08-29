@@ -1,5 +1,4 @@
-/* SKIPPF service worker v20260829 — Web Push ke telefon */
-const ALERTS_URL = './alerts.json';
+/* SKIPPF service worker v20260829c — Web Push, KPI auto dimatikan */
 const ICON = './icon-192.png';
 const HOME = './?home=1';
 
@@ -19,15 +18,17 @@ self.addEventListener('push', function (event) {
         try { data = { body: event.data.text() }; } catch (e2) {}
       }
     }
-    if (!data.title && !data.body) {
-      try { data = await (await fetch(ALERTS_URL, { cache: 'no-store' })).json(); } catch (e) {}
-    }
-    await showAlert(data, true);
+    var title = data.title || 'SKIPPF';
+    var body = data.body || 'Ada kemaskini SKIPPF.';
+    await self.registration.showNotification(title, {
+      body: body,
+      icon: ICON,
+      badge: ICON,
+      tag: data.tag || 'skippf-push',
+      renotify: true,
+      data: { url: data.url || HOME }
+    });
   })());
-});
-
-self.addEventListener('periodicsync', function (event) {
-  if (event.tag === 'skippf-kpi') event.waitUntil(checkAlerts());
 });
 
 self.addEventListener('notificationclick', function (event) {
@@ -35,64 +36,3 @@ self.addEventListener('notificationclick', function (event) {
   var url = (event.notification.data && event.notification.data.url) || HOME;
   event.waitUntil(self.clients.openWindow(url));
 });
-
-self.addEventListener('message', function (event) {
-  if (event.data && event.data.type === 'check-alerts') {
-    event.waitUntil(checkAlerts());
-  }
-});
-
-async function checkAlerts() {
-  var data = await (await fetch(ALERTS_URL, { cache: 'no-store' })).json();
-  var last = await getLastFp();
-  if (!data || !data.fingerprint) return;
-  if (last === data.fingerprint) return;
-  await setLastFp(data.fingerprint);
-  if (data.count > 0) await showAlert(data, false);
-}
-
-async function showAlert(data, fromPush) {
-  data = data || {};
-  if (!fromPush && data.count === 0) return;
-  var title = data.title || 'SKIPPF';
-  var body = data.body || 'Ada kemaskini SKIPPF.';
-  await self.registration.showNotification(title, {
-    body: body,
-    icon: ICON,
-    badge: ICON,
-    tag: data.tag || (fromPush ? 'skippf-push' : 'skippf-kpi'),
-    renotify: true,
-    data: { url: data.url || HOME }
-  });
-}
-
-function idb() {
-  return new Promise(function (resolve, reject) {
-    var req = indexedDB.open('skippf-push', 1);
-    req.onupgradeneeded = function () { req.result.createObjectStore('kv'); };
-    req.onsuccess = function () { resolve(req.result); };
-    req.onerror = function () { reject(req.error); };
-  });
-}
-
-async function getLastFp() {
-  try {
-    var db = await idb();
-    return await new Promise(function (resolve, reject) {
-      var r = db.transaction('kv').objectStore('kv').get('fp');
-      r.onsuccess = function () { resolve(r.result || ''); };
-      r.onerror = function () { reject(r.error); };
-    });
-  } catch (e) { return ''; }
-}
-
-async function setLastFp(fp) {
-  try {
-    var db = await idb();
-    await new Promise(function (resolve, reject) {
-      var r = db.transaction('kv', 'readwrite').objectStore('kv').put(fp, 'fp');
-      r.onsuccess = function () { resolve(); };
-      r.onerror = function () { reject(r.error); };
-    });
-  } catch (e) {}
-}
