@@ -1,19 +1,12 @@
 {
-  "updated": "2026-09-03T03:51:16Z",
+  "updated": "2026-09-04T03:53:07Z",
   "threshold": 58,
-  "count": 2,
-  "fingerprint": "OP8-1:53.7|OP12-1:33.3",
-  "title": "SKIPPF: 2 indikator PERHATIAN",
-  "body": "OP8-1 54% · OP12-1 33%",
+  "count": 1,
+  "fingerprint": "OP12-1:33.3",
+  "title": "SKIPPF: 1 indikator PERHATIAN",
+  "body": "OP12-1 33%",
   "url": "https://cpfpahang.github.io/skippf/dashboard/",
   "items": [
-    {
-      "id": "OP8-1",
-      "nama": "Bilangan kertas penyiasatan yang diselesaikan",
-      "pic": "HAFIZAH",
-      "pct": 53.7,
-      "bahagian": "OUTPUT"
-    },
     {
       "id": "OP12-1",
       "nama": "Operasi khas ke atas bahan terkawal farmaseutikal",
