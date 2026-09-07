@@ -1,5 +1,5 @@
 /* SKIPPF service worker v20260829c — Web Push, KPI auto dimatikan */
-const ICON = './icon-192.png?v=20260906';
+const ICON = './icon-192.png?v=20260907';
 const HOME = './?home=1';
 
 self.addEventListener('install', function (event) {
