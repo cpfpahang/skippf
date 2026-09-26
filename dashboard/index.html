@@ -23,8 +23,8 @@ body{font-family:'Segoe UI',-apple-system,system-ui,Roboto,Arial,sans-serif;back
 .hdr::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(135deg,rgba(255,255,255,.025) 0 2px,transparent 2px 22px);pointer-events:none;}
 .hdr::after{content:"";position:absolute;left:0;right:0;bottom:0;height:4px;background:linear-gradient(90deg,var(--gold),var(--gold-l),var(--gold));}
 .hdr-left{display:flex;align-items:center;gap:15px;position:relative;}
-.brand-logo{display:block;width:180px;height:68px;object-fit:contain;flex:none;box-sizing:border-box;
-  background:#fff;border-radius:10px;padding:7px 10px;box-shadow:0 2px 10px rgba(0,0,0,.14);}
+.brand-logo{display:block;width:50px;height:50px;object-fit:contain;flex:none;box-sizing:border-box;
+  background:var(--navy);border-radius:10px;padding:0;box-shadow:0 2px 10px rgba(0,0,0,.14);}
 @media(max-width:640px){.hdr-left{flex-direction:column;align-items:flex-start;gap:8px}.hdr-right{text-align:left}}
 .kick{font-size:10px;letter-spacing:2.4px;text-transform:uppercase;color:var(--gold-l);font-weight:700;}
 .hdr h1{font-size:18px;font-weight:800;margin-top:2px;}
@@ -144,7 +144,7 @@ const CONFIG = {
 
 <div class="hdr">
   <div class="hdr-left">
-    <img class="brand-logo" src="../logo-skippf.png?v=20260907" alt="One Stop Centre SKIPPF" width="180" height="68">
+    <img class="brand-logo" src="../icon-192.png?v=20260907" alt="Logo S SKIPPF" width="50" height="50">
     <div>
       <div class="kick">Kementerian Kesihatan Malaysia</div>
       <h1>Dashboard Bersepadu CPF Pahang 2026</h1>
