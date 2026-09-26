@@ -23,8 +23,9 @@ body{font-family:'Segoe UI',-apple-system,system-ui,Roboto,Arial,sans-serif;back
 .hdr::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(135deg,rgba(255,255,255,.025) 0 2px,transparent 2px 22px);pointer-events:none;}
 .hdr::after{content:"";position:absolute;left:0;right:0;bottom:0;height:4px;background:linear-gradient(90deg,var(--gold),var(--gold-l),var(--gold));}
 .hdr-left{display:flex;align-items:center;gap:15px;position:relative;}
-.crest{width:50px;height:50px;border-radius:50%;flex:none;display:grid;place-items:center;font-size:24px;
-  background:radial-gradient(circle at 30% 25%,#1c4c84,#0a2b4e);border:2px solid var(--gold);box-shadow:0 0 0 4px rgba(201,162,39,.12);}
+.brand-logo{display:block;width:180px;height:68px;object-fit:contain;flex:none;box-sizing:border-box;
+  background:#fff;border-radius:10px;padding:7px 10px;box-shadow:0 2px 10px rgba(0,0,0,.14);}
+@media(max-width:640px){.hdr-left{flex-direction:column;align-items:flex-start;gap:8px}.hdr-right{text-align:left}}
 .kick{font-size:10px;letter-spacing:2.4px;text-transform:uppercase;color:var(--gold-l);font-weight:700;}
 .hdr h1{font-size:18px;font-weight:800;margin-top:2px;}
 .hdr p{font-size:11px;opacity:.82;margin-top:3px;}
@@ -118,9 +119,11 @@ tbody td:not(:first-child){text-align:center;}
 .setup h2{color:var(--navy);font-size:16px;margin-bottom:10px;} .setup code{background:#f1f4f8;padding:2px 6px;border-radius:5px;font-size:12px;}
 .setup ol{margin:12px 0 0 18px;line-height:1.9;font-size:12.5px;}
 footer{text-align:center;padding:18px;color:var(--muted);font-size:10px;border-top:1px solid var(--border);margin-top:8px;}
+body.data-loading #pane-ringkasan,body.data-loading #pane-kpi,body.data-loading #pane-qap,body.data-loading #pane-outcome,body.data-loading #pane-output{visibility:hidden}
 </style>
 </head>
-<body>
+<body class="data-loading">
+<noscript><div class="banner">Aktifkan JavaScript untuk memuatkan data dashboard semasa.</div></noscript>
 
 <!-- ════════════════════════════════════════════════════════════════
      KONFIGURASI — ISI DI SINI
@@ -134,14 +137,14 @@ const CONFIG = {
   SHEET_ID_DATA:  "1AdB2xXm6c2MaamHYvLzNtv_sWy4zo1wFn1-slfLNQPo",  // KPI/QAP/OBB Outcome/OBB Output
   DATA_GID:       "1394180751", // tab cache dashboard (salinan automatik sumber induk)
   SHEET_ID_PELAN: "1J-rHCU5CWA0U5T4-EXv1ouZrkbDuMsr76vQvdSDzhO4",  // Pelan Tindakan
-  PERIOD: "Jan–Julai 2026",
-  THRESHOLD: 58         // jangkaan kemajuan selepas 7/12 bulan
+  PERIOD: "2026",
+  THRESHOLD: 100        // selaras dengan status sasaran tahunan dalam SKIPPF
 };
 </script>
 
 <div class="hdr">
   <div class="hdr-left">
-    <div class="crest">⚖️</div>
+    <img class="brand-logo" src="../logo-skippf.png?v=20260907" alt="One Stop Centre SKIPPF" width="180" height="68">
     <div>
       <div class="kick">Kementerian Kesihatan Malaysia</div>
       <h1>Dashboard Bersepadu CPF Pahang 2026</h1>
@@ -167,9 +170,9 @@ const CONFIG = {
   <div id="setup-msg"></div>
 
   <div class="pane active" id="pane-ringkasan">
-    <div class="banner">ℹ️ <span>Data sehingga <strong id="banner-period">Jan–Julai 2026</strong>. Sasaran tahunan = 12 bulan. Jangkaan semasa ≈ <strong id="banner-thr">58</strong>% dari sasaran tahunan.</span></div>
+    <div class="banner">ℹ️ <span><strong id="banner-period">Data 2026</strong>. Status capai dikira terhadap sasaran tahunan SKIPPF; kemas kini setiap bulan mungkin berbeza mengikut indikator.</span></div>
     <div class="gauge-row">
-      <div class="gaugecard"><h3>Output On Track</h3>
+      <div class="gaugecard"><h3>Output Capai Sasaran Tahunan</h3>
         <div class="gwrap"><canvas id="gaugeOverall" style="display: block; box-sizing: border-box; height: 150px; width: 202px;" width="304" height="225"></canvas><div class="gctr"><div class="big" id="gaugeBig">96%</div><div class="sub" id="gaugeSub">22/23 output</div></div></div>
       </div>
       <div class="cards" id="summary-cards" style="margin-bottom:0">
@@ -185,7 +188,7 @@ const CONFIG = {
     </div>
     <div class="sec-hd"><span class="dot g"></span>Output Melebihi / Capai Sasaran (≥100%)</div>
     <div class="tbl-wrap"><table><thead><tr><th>Indikator</th><th>Sasaran</th><th>Jan–Julai</th><th>% Tahunan</th><th>Status</th></tr></thead><tbody id="top-table"><tr><td class="td-desc">Pemeriksaan AEB ke atas premis pemborong &amp; pengimport</td><td>7</td><td class="td-b">7</td><td><div class="mbar"><strong>100%</strong><div class="mb"><div class="mbf fill-g" style="width:100%"></div></div></div></td><td><span class="tg">CAPAI / MELEBIHI ✅</span></td></tr><tr><td class="td-desc">Pemeriksaan Khas pengimport/pengedar bahan prekursor</td><td>2</td><td class="td-b">2</td><td><div class="mbar"><strong>100%</strong><div class="mb"><div class="mbf fill-g" style="width:100%"></div></div></div></td><td><span class="tg">CAPAI / MELEBIHI ✅</span></td></tr><tr><td class="td-desc">Lesen Racun A,B,E / Permit NaOH / Psikotropik dikeluarkan</td><td>260</td><td class="td-b">491</td><td><div class="mbar"><strong>189%</strong><div class="mb"><div class="mbf fill-g" style="width:100%"></div></div></div></td><td><span class="tg">CAPAI / MELEBIHI ✅</span></td></tr><tr><td class="td-desc">Aduan diterima yang diambil tindakan</td><td>20</td><td class="td-b">22</td><td><div class="mbar"><strong>110%</strong><div class="mb"><div class="mbf fill-g" style="width:100%"></div></div></div></td><td><span class="tg">CAPAI / MELEBIHI ✅</span></td></tr><tr><td class="td-desc">Maklumbalas dikeluarkan kepada pengadu</td><td>15</td><td class="td-b">19</td><td><div class="mbar"><strong>127%</strong><div class="mb"><div class="mbf fill-g" style="width:100%"></div></div></div></td><td><span class="tg">CAPAI / MELEBIHI ✅</span></td></tr><tr><td class="td-desc">Maklumat berkualiti dibangunkan untuk tindakan</td><td>13</td><td class="td-b">13</td><td><div class="mbar"><strong>100%</strong><div class="mb"><div class="mbf fill-g" style="width:100%"></div></div></div></td><td><span class="tg">CAPAI / MELEBIHI ✅</span></td></tr><tr><td class="td-desc">Rampasan digital yang dijalankan</td><td>6</td><td class="td-b">6</td><td><div class="mbar"><strong>100%</strong><div class="mb"><div class="mbf fill-g" style="width:100%"></div></div></div></td><td><span class="tg">CAPAI / MELEBIHI ✅</span></td></tr><tr><td class="td-desc">Persampelan produk/kosmetik mengandungi elemen terlarang</td><td>14</td><td class="td-b">17</td><td><div class="mbar"><strong>121%</strong><div class="mb"><div class="mbf fill-g" style="width:100%"></div></div></div></td><td><span class="tg">CAPAI / MELEBIHI ✅</span></td></tr><tr><td class="td-desc">Bilangan kehadiran ke mahkamah untuk pendakwaan kes</td><td>59</td><td class="td-b">76</td><td><div class="mbar"><strong>129%</strong><div class="mb"><div class="mbf fill-g" style="width:100%"></div></div></div></td><td><span class="tg">CAPAI / MELEBIHI ✅</span></td></tr><tr><td class="td-desc">Bilangan bahan aktiviti kesedaran disediakan</td><td>17</td><td class="td-b">21</td><td><div class="mbar"><strong>124%</strong><div class="mb"><div class="mbf fill-g" style="width:100%"></div></div></div></td><td><span class="tg">CAPAI / MELEBIHI ✅</span></td></tr></tbody></table></div>
-    <div class="sec-hd"><span class="dot r"></span>Output Perhatian — Di bawah jangkaan 50%</div>
+    <div class="sec-hd"><span class="dot r"></span>Output Belum Capai Sasaran Tahunan</div>
     <div class="tbl-wrap"><table><thead><tr><th>Indikator</th><th>Sasaran</th><th>Jan–Julai</th><th>% Tahunan</th><th>Status</th></tr></thead><tbody id="risk-table"><tr><td class="td-desc">Operasi khas ke atas bahan terkawal farmaseutikal</td><td>3</td><td class="td-b">1</td><td><div class="mbar"><strong>33%</strong><div class="mb"><div class="mbf fill-r" style="width:33%"></div></div></div></td><td><span class="tr">PERHATIAN ⚠️</span></td></tr></tbody></table></div>
   </div>
 
@@ -210,10 +213,10 @@ const CONFIG = {
   </div>
 
   <div class="pane" id="pane-output">
-    <div class="banner">ℹ️ OBB Output diukur dalam bilangan. <strong style="color:#b45309">Merah = di bawah 50%</strong>, Kuning = on track, Hijau = capai/melebihi.</div>
+    <div class="banner">ℹ️ OBB Output diukur dalam bilangan. Hijau = capai sasaran tahunan; merah = belum capai sasaran tahunan.</div>
     <div class="tbl-wrap"><table><thead><tr>
       <th style="min-width:250px">Indikator Output</th><th>PIC</th><th>Sasaran</th>
-      <th>Jan</th><th>Feb</th><th>Mac</th><th>Apr</th><th>Mei</th><th>Jun</th><th>Julai</th><th>Jan–Julai</th><th style="min-width:100px">% Tahunan</th><th>Status</th>
+      <th>Jan</th><th>Feb</th><th>Mac</th><th>Apr</th><th>Mei</th><th>Jun</th><th>Julai</th><th>Ogo</th><th>Sep</th><th>Okt</th><th>Nov</th><th>Dis</th><th>Jumlah 2026</th><th style="min-width:100px">% Tahunan</th><th>Status</th>
     </tr></thead><tbody id="output-table"><tr class="grp"><td colspan="12">Output 1 — Pemeriksaan Premis (AOTP15786)</td></tr><tr><td class="td-desc">Pemeriksaan premis mengendalikan item terkawal</td><td style="color:var(--muted)">ARIF</td><td>719</td><td>128</td><td>43</td><td>94</td><td>61</td><td>65</td><td>51</td><td class="td-b">492</td><td><div class="mbar"><strong>68%</strong><div class="mb"><div class="mbf fill-a" style="width:68%"></div></div></div></td><td><span class="ta">ON TRACK 🟡</span></td></tr><tr><td class="td-desc">Pemeriksaan AEB ke atas premis pemborong &amp; pengimport</td><td style="color:var(--muted)">ARIF</td><td>7</td><td>0</td><td>2</td><td>2</td><td>0</td><td>0</td><td>1</td><td class="td-b">7</td><td><div class="mbar"><strong>100%</strong><div class="mb"><div class="mbf fill-g" style="width:100%"></div></div></div></td><td><span class="tg">CAPAI / MELEBIHI ✅</span></td></tr><tr><td class="td-desc">Pemeriksaan Khas pengimport/pengedar bahan prekursor</td><td style="color:var(--muted)">MASTURA</td><td>2</td><td>0</td><td>0</td><td>0</td><td>2</td><td>0</td><td>0</td><td class="td-b">2</td><td><div class="mbar"><strong>100%</strong><div class="mb"><div class="mbf fill-g" style="width:100%"></div></div></div></td><td><span class="tg">CAPAI / MELEBIHI ✅</span></td></tr><tr><td class="td-desc">Pemeriksaan Aktiviti Pelupusan Bahan Terkawal</td><td style="color:var(--muted)">SARMILA</td><td>8</td><td>0</td><td>0</td><td>2</td><td>0</td><td>1</td><td>1</td><td class="td-b">6</td><td><div class="mbar"><strong>75%</strong><div class="mb"><div class="mbf fill-a" style="width:75%"></div></div></div></td><td><span class="ta">ON TRACK 🟡</span></td></tr><tr class="grp"><td colspan="12">Output 2 — Pemeriksaan Pintu Masuk (AOTP15788)</td></tr><tr><td class="td-desc">Bilangan konsainan disemak di Pintu Masuk</td><td style="color:var(--muted)">HAZIRAH</td><td>4,000</td><td>474</td><td>271</td><td>304</td><td>547</td><td>421</td><td>331</td><td class="td-b">2,788</td><td><div class="mbar"><strong>70%</strong><div class="mb"><div class="mbf fill-a" style="width:70%"></div></div></div></td><td><span class="ta">ON TRACK 🟡</span></td></tr><tr><td class="td-desc">Bilangan perkara disemak di Pintu Masuk</td><td style="color:var(--muted)">HAZIRAH</td><td>4,500</td><td>661</td><td>541</td><td>508</td><td>884</td><td>662</td><td>537</td><td class="td-b">4,296</td><td><div class="mbar"><strong>95%</strong><div class="mb"><div class="mbf fill-a" style="width:95%"></div></div></div></td><td><span class="ta">ON TRACK 🟡</span></td></tr><tr class="grp"><td colspan="12">Output 3 — Pengeluaran Lesen/Permit (AOTP15791)</td></tr><tr><td class="td-desc">Lesen Racun A,B,E / Permit NaOH / Psikotropik dikeluarkan</td><td style="color:var(--muted)">SYAHMI</td><td>260</td><td>416</td><td>5</td><td>5</td><td>6</td><td>9</td><td>8</td><td class="td-b">491</td><td><div class="mbar"><strong>189%</strong><div class="mb"><div class="mbf fill-g" style="width:100%"></div></div></div></td><td><span class="tg">CAPAI / MELEBIHI ✅</span></td></tr><tr class="grp"><td colspan="12">Output 6 — Pemonitoran &amp; Tindakan Iklan Perubatan (AOTP15794)</td></tr><tr><td class="td-desc">Iklan melanggar UU dinotifikasi untuk diturunkan</td><td style="color:var(--muted)">RABANI/AINA</td><td>600</td><td>41</td><td>76</td><td>79</td><td>69</td><td>44</td><td>24</td><td class="td-b">480</td><td><div class="mbar"><strong>80%</strong><div class="mb"><div class="mbf fill-a" style="width:80%"></div></div></div></td><td><span class="ta">ON TRACK 🟡</span></td></tr><tr class="grp"><td colspan="12">Output 7 — Serbuan (AOTP158000)</td></tr><tr><td class="td-desc">Serbuan berjaya diambil tindakan penguatkuasaan</td><td style="color:var(--muted)">SALWANI</td><td>74</td><td>7</td><td>2</td><td>1</td><td>10</td><td>12</td><td>9</td><td class="td-b">45</td><td><div class="mbar"><strong>61%</strong><div class="mb"><div class="mbf fill-a" style="width:61%"></div></div></div></td><td><span class="ta">ON TRACK 🟡</span></td></tr><tr class="grp"><td colspan="12">Output 8 — Siasatan Diselesaikan (AOTP15801)</td></tr><tr><td class="td-desc">Bilangan Kertas Penyiasatan diselesaikan</td><td style="color:var(--muted)">HAFIZAH</td><td>54</td><td>7</td><td>4</td><td>10</td><td>3</td><td>0</td><td>1</td><td class="td-b">29</td><td><div class="mbar"><strong>54%</strong><div class="mb"><div class="mbf fill-a" style="width:54%"></div></div></div></td><td><span class="ta">ON TRACK 🟡</span></td></tr><tr class="grp"><td colspan="12">Output — Aduan &amp; Maklumat Penguatkuasaan</td></tr><tr><td class="td-desc">Aduan diterima yang diambil tindakan</td><td style="color:var(--muted)">KHAIRUL</td><td>20</td><td>5</td><td>1</td><td>1</td><td>4</td><td>4</td><td>4</td><td class="td-b">22</td><td><div class="mbar"><strong>110%</strong><div class="mb"><div class="mbf fill-g" style="width:100%"></div></div></div></td><td><span class="tg">CAPAI / MELEBIHI ✅</span></td></tr><tr><td class="td-desc">Maklumbalas dikeluarkan kepada pengadu</td><td style="color:var(--muted)">KHAIRUL</td><td>15</td><td>3</td><td>3</td><td>2</td><td>3</td><td>4</td><td>1</td><td class="td-b">19</td><td><div class="mbar"><strong>127%</strong><div class="mb"><div class="mbf fill-g" style="width:100%"></div></div></div></td><td><span class="tg">CAPAI / MELEBIHI ✅</span></td></tr><tr><td class="td-desc">Maklumat berkualiti dibangunkan untuk tindakan</td><td style="color:var(--muted)">KHAIRUL</td><td>13</td><td>0</td><td>3</td><td>1</td><td>4</td><td>2</td><td>1</td><td class="td-b">13</td><td><div class="mbar"><strong>100%</strong><div class="mb"><div class="mbf fill-g" style="width:100%"></div></div></div></td><td><span class="tg">CAPAI / MELEBIHI ✅</span></td></tr><tr class="grp"><td colspan="12">Output 12 — Operasi Khas Bahan Terkawal</td></tr><tr><td class="td-desc">Operasi khas ke atas bahan terkawal farmaseutikal</td><td style="color:var(--muted)">SHAIFUL</td><td>3</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td class="td-b">1</td><td><div class="mbar"><strong>33%</strong><div class="mb"><div class="mbf fill-r" style="width:33%"></div></div></div></td><td><span class="tr">PERHATIAN ⚠️</span></td></tr><tr><td class="td-desc">Operasi khas ke atas bahan psikotropik</td><td style="color:var(--muted)">SHAIFUL</td><td>9</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>4</td><td class="td-b">6</td><td><div class="mbar"><strong>67%</strong><div class="mb"><div class="mbf fill-a" style="width:67%"></div></div></div></td><td><span class="ta">ON TRACK 🟡</span></td></tr><tr class="grp"><td colspan="12">Output 14 — Siber &amp; Inteligens</td></tr><tr><td class="td-desc">Laporan profiling daripada inteligens siber</td><td style="color:var(--muted)">HAFRIZAN</td><td>35</td><td>2</td><td>0</td><td>1</td><td>3</td><td>6</td><td>6</td><td class="td-b">18</td><td><div class="mbar"><strong>51%</strong><div class="mb"><div class="mbf fill-a" style="width:51%"></div></div></div></td><td><span class="ta">ON TRACK 🟡</span></td></tr><tr><td class="td-desc">Rampasan digital yang dijalankan</td><td style="color:var(--muted)">HAFRIZAN</td><td>6</td><td>0</td><td>0</td><td>0</td><td>0</td><td>6</td><td>0</td><td class="td-b">6</td><td><div class="mbar"><strong>100%</strong><div class="mb"><div class="mbf fill-g" style="width:100%"></div></div></div></td><td><span class="tg">CAPAI / MELEBIHI ✅</span></td></tr><tr class="grp"><td colspan="12">Output 15 — Persampelan</td></tr><tr><td class="td-desc">Persampelan produk/kosmetik mengandungi bahan kimia terlarang</td><td style="color:var(--muted)">AMMAR</td><td>25</td><td>5</td><td>0</td><td>2</td><td>1</td><td>4</td><td>5</td><td class="td-b">20</td><td><div class="mbar"><strong>80%</strong><div class="mb"><div class="mbf fill-a" style="width:80%"></div></div></div></td><td><span class="ta">ON TRACK 🟡</span></td></tr><tr><td class="td-desc">Persampelan produk/kosmetik mengandungi elemen terlarang</td><td style="color:var(--muted)">AMMAR</td><td>14</td><td>3</td><td>0</td><td>2</td><td>3</td><td>0</td><td>2</td><td class="td-b">17</td><td><div class="mbar"><strong>121%</strong><div class="mb"><div class="mbf fill-g" style="width:100%"></div></div></div></td><td><span class="tg">CAPAI / MELEBIHI ✅</span></td></tr><tr class="grp"><td colspan="12">Output — Pendakwaan</td></tr><tr><td class="td-desc">Bilangan kehadiran ke mahkamah untuk pendakwaan kes</td><td style="color:var(--muted)">SYAFIQ</td><td>59</td><td>10</td><td>10</td><td>8</td><td>13</td><td>12</td><td>16</td><td class="td-b">76</td><td><div class="mbar"><strong>129%</strong><div class="mb"><div class="mbf fill-g" style="width:100%"></div></div></div></td><td><span class="tg">CAPAI / MELEBIHI ✅</span></td></tr><tr class="grp"><td colspan="12">Output — Aktiviti Kesedaran Awam</td></tr><tr><td class="td-desc">Bilangan aktiviti kesedaran dijalankan</td><td style="color:var(--muted)">NADWANIE</td><td>95</td><td>18</td><td>9</td><td>30</td><td>7</td><td>4</td><td>2</td><td class="td-b">78</td><td><div class="mbar"><strong>82%</strong><div class="mb"><div class="mbf fill-a" style="width:82%"></div></div></div></td><td><span class="ta">ON TRACK 🟡</span></td></tr><tr><td class="td-desc">Bilangan bahan aktiviti kesedaran disediakan</td><td style="color:var(--muted)">FAIZ</td><td>17</td><td>2</td><td>4</td><td>11</td><td>1</td><td>1</td><td>1</td><td class="td-b">21</td><td><div class="mbar"><strong>124%</strong><div class="mb"><div class="mbf fill-g" style="width:100%"></div></div></div></td><td><span class="tg">CAPAI / MELEBIHI ✅</span></td></tr><tr class="grp"><td colspan="12">Output — Imbasan Hologram</td></tr><tr><td class="td-desc">Imbasan label keselamatan hologram pada produk di pasaran</td><td style="color:var(--muted)">AZIZI</td><td>2,500</td><td>94</td><td>82</td><td>104</td><td>161</td><td>280</td><td>1091</td><td class="td-b">1,812</td><td><div class="mbar"><strong>72%</strong><div class="mb"><div class="mbf fill-a" style="width:72%"></div></div></div></td><td><span class="ta">ON TRACK 🟡</span></td></tr></tbody></table></div>
   </div>
 
@@ -249,7 +252,7 @@ Pautan: <a href="https://www.epsa.gov.my/enrol/index.php?id=1035" target="_blank
 <footer>Cawangan Penguatkuasaan Farmasi (CPF) Pahang &nbsp;|&nbsp; JKN Pahang &nbsp;|&nbsp; KKM &nbsp;|&nbsp; 2026 &nbsp;·&nbsp; Sumber: Google Sheet (live)</footer>
 
 <script>
-let D = {kpi:[],kpi3:[],qap:[],outcome:[],output:[],period:CONFIG.PERIOD,threshold:CONFIG.THRESHOLD};
+let D = {kpi:[],kpi3:[],kpiInduk:[],qap:[],outcome:[],output:[],period:CONFIG.PERIOD,threshold:CONFIG.THRESHOLD};
 let PT_DATA=[], charts={}, ptFilter='all', ptQ='';
 
 /* ───── GVIZ FETCH (JSONP — elak sekatan CORS, jalan dari file:// & hosted) ───── */
@@ -286,12 +289,15 @@ const pctTarget=v=>{const n=N(v);return n!==null&&n<=1?n*100:n;};
 
 /* ───── BINA STRUKTUR D DARI TAB DATA ───── */
 function buildD(rows){
-  const d={kpi:[],kpi3:[],qap:[],outcome:[],output:[],period:CONFIG.PERIOD,threshold:CONFIG.THRESHOLD};
+  const d={kpi:[],kpi3:[],kpiInduk:[],qap:[],outcome:[],output:[],period:CONFIG.PERIOD,threshold:CONFIG.THRESHOLD};
   rows.forEach(r=>{
     const bhg=S(r.bahagian).toUpperCase();
     if(bhg==='KPI'){
-      if(!/-n\d+$/i.test(S(r.id))) return;
       const id=S(r.id);
+      if(!/-n\d+$/i.test(id)){
+        d.kpiInduk.push({id,tgt:N(r.sasaran),pct:N(r.pencapaian)});
+        return;
+      }
       const o={id,name:S(r.nama),tgt:pctTarget(r.sasaran)??KPI_TARGETS[id],pct:N(r.pencapaian),num:N(r.num),den:N(r.den)};
       (S(r.kumpulan).toUpperCase().includes('PK3')?d.kpi3:d.kpi).push(o);
     } else if(bhg==='QAP'){
@@ -302,21 +308,21 @@ function buildD(rows){
     } else if(bhg==='OUTPUT_GRP'){
       d.output.push({grp:S(r.nama)});
     } else if(bhg==='OUTPUT'){
-      d.output.push({id:S(r.id),name:S(r.nama),pic:S(r.pic),annual:N(r.sasaran),jan:N(r.jan),feb:N(r.feb),mac:N(r.mac),apr:N(r.apr),mei:N(r.mei),jun:N(r.jun),jul:N(r.jul),cum:N(r.jumlah)??N(r.janjun)});
+      d.output.push({id:S(r.id),name:S(r.nama),pic:S(r.pic),annual:N(r.sasaran),jan:N(r.jan),feb:N(r.feb),mac:N(r.mac),apr:N(r.apr),mei:N(r.mei),jun:N(r.jun),jul:N(r.jul),ogo:N(r.ogo),sep:N(r.sep),okt:N(r.okt),nov:N(r.nov),dis:N(r.dis),cum:N(r.jumlah)??N(r.janjun)});
     }
   });
   return d;
 }
 
 /* ───── HELPERS ───── */
-function pct(a,b){ return (b&&b>0)?Math.round((a/b)*100):null; }
+function pct(a,b){ return (a!==null&&b&&b>0)?(a/b)*100:null; }
 function thr(){ return D.threshold||50; }
-function statusClass(p){ return p>=100?'tg':p>=thr()?'ta':'tr'; }
-function statusLabel(p){ return p>=100?'CAPAI / MELEBIHI ✅':p>=thr()?'ON TRACK 🟡':'PERHATIAN ⚠️'; }
+function statusClass(p){ return p>=100?'tg':'tr'; }
+function statusLabel(p){ return p>=100?'CAPAI / MELEBIHI ✅':'BELUM CAPAI SASARAN'; }
 function cell(v){ return (v===null||v===undefined)?'<span style="color:var(--muted)">—</span>':v; }
-function fillClass(p){ return p>=100?'fill-g':p>=thr()?'fill-a':'fill-r'; }
+function fillClass(p){ return p>=100?'fill-g':'fill-r'; }
 function mbar(p){ if(p===null) return `<div class="mbar" style="color:var(--muted);font-style:italic;font-size:10px">—</div>`;
-  return `<div class="mbar"><strong>${p}%</strong><div class="mb"><div class="mbf ${fillClass(p)}" style="width:${Math.min(p,100)}%"></div></div></div>`; }
+  return `<div class="mbar"><strong>${(Math.round(p*10)/10).toLocaleString('ms-MY')}%</strong><div class="mb"><div class="mbf ${fillClass(p)}" style="width:${Math.min(p,100)}%"></div></div></div>`; }
 function showTab(id,el){
   document.querySelectorAll('.pane').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
@@ -328,33 +334,41 @@ function showTab(id,el){
 /* ───── RENDER (sama seperti versi Cowork) ───── */
 function renderCards(){
   const ops=D.output.filter(r=>r.id&&r.annual);
-  const onTrack=ops.filter(r=>pct(r.cum,r.annual)>=thr()).length;
-  const risk=ops.filter(r=>pct(r.cum,r.annual)<thr()).length;
   const achieved=ops.filter(r=>pct(r.cum,r.annual)>=100).length;
+  const outputMissing=ops.filter(r=>r.cum===null).length;
+  const below=ops.length-achieved-outputMissing;
   const kpiAll=[...D.kpi,...D.kpi3];
   const kpiCap=kpiAll.filter(k=>k.pct!==null&&k.pct>=k.tgt).length;
+  const kpiIndukCap=D.kpiInduk.filter(k=>k.pct!==null&&k.pct>=k.tgt).length;
   const cap=D.qap.filter(q=>q.pct!==null&&q.pct>=q.std).length, tot=D.qap.length, blm=D.qap.filter(q=>q.pct===null).length;
   const outCap=D.outcome.filter(o=>o.pct!==null&&o.pct>=o.tgt).length;
+  const total=kpiAll.length+D.kpiInduk.length+tot+D.outcome.length+ops.length;
+  const totalCap=kpiCap+kpiIndukCap+cap+outCap+achieved;
+  const totalBelum=blm+outputMissing+kpiAll.filter(k=>k.pct===null).length+D.kpiInduk.filter(k=>k.pct===null).length+D.outcome.filter(o=>o.pct===null).length;
   document.getElementById('summary-cards').innerHTML=`
+    <div class="card"><div class="lbl">Jumlah Indikator SKIPPF</div><div class="val">${total}</div><div class="sub">KPI · QAP · OBB</div></div>
+    <div class="card g"><div class="lbl">Capai Sasaran</div><div class="val">${totalCap}</div><div class="sub">Sasaran tahunan</div></div>
+    <div class="card r"><div class="lbl">Bawah Sasaran</div><div class="val">${total-totalCap-totalBelum}</div><div class="sub">Dalam usaha</div></div>
+    <div class="card m"><div class="lbl">Belum Lengkap</div><div class="val">${totalBelum}</div><div class="sub">Tiada pencapaian</div></div>
     <div class="card g"><div class="lbl">KPI Capai Sasaran</div><div class="val">${kpiCap}/${kpiAll.length}</div><div class="sub">Penanda KPI ✅</div></div>
     <div class="card g"><div class="lbl">QAP Capai Sasaran</div><div class="val">${cap}/${tot}</div><div class="sub">${cap} capai ✅${blm?` · ${blm} belum mula ⏸`:''}</div></div>
     <div class="card g"><div class="lbl">OBB Outcome</div><div class="val">${outCap}/${D.outcome.length}</div><div class="sub">Outcome ≥ sasaran ✅</div></div>
-    <div class="card a"><div class="lbl">Output On Track (≥${thr()}%)</div><div class="val">${onTrack}/${ops.length}</div><div class="sub">Termasuk ${achieved} melebihi</div></div>
-    <div class="card r"><div class="lbl">Output Perhatian</div><div class="val">${risk}</div><div class="sub">Di bawah ${thr()}% ⚠️</div></div>`;
-  const pctOnTrack=ops.length?Math.round(onTrack/ops.length*100):0;
-  document.getElementById('gaugeBig').textContent=pctOnTrack+'%';
-  document.getElementById('gaugeSub').textContent=onTrack+'/'+ops.length+' output';
+    <div class="card g"><div class="lbl">OBB Output Capai</div><div class="val">${achieved}/${ops.length}</div><div class="sub">Sasaran tahunan</div></div>
+    <div class="card r"><div class="lbl">OBB Output Bawah Sasaran</div><div class="val">${below}</div><div class="sub">Dalam usaha</div></div>`;
+  const pctCapai=ops.length?Math.round(achieved/ops.length*100):0;
+  document.getElementById('gaugeBig').textContent=pctCapai+'%';
+  document.getElementById('gaugeSub').textContent=achieved+'/'+ops.length+' output';
   if(charts.gauge) charts.gauge.destroy();
   charts.gauge=new Chart(document.getElementById('gaugeOverall'),{type:'doughnut',
-    data:{datasets:[{data:[pctOnTrack,Math.max(0,100-pctOnTrack)],backgroundColor:[pctOnTrack>=75?'#1e8e54':pctOnTrack>=50?'#c9a227':'#d99413','#eef1f4'],borderWidth:0,circumference:270,rotation:225}]},
+    data:{datasets:[{data:[pctCapai,Math.max(0,100-pctCapai)],backgroundColor:['#1e8e54','#eef1f4'],borderWidth:0,circumference:270,rotation:225}]},
     options:{responsive:true,maintainAspectRatio:false,cutout:'76%',plugins:{legend:{display:false},tooltip:{enabled:false}}}});
 }
 function renderTopRisk(){
   const ops=D.output.filter(r=>r.id&&r.annual);
-  const top=ops.filter(r=>pct(r.cum,r.annual)>=100), risk=ops.filter(r=>pct(r.cum,r.annual)<thr());
+  const top=ops.filter(r=>pct(r.cum,r.annual)>=100), risk=ops.filter(r=>{const p=pct(r.cum,r.annual);return p!==null&&p<100;});
   const row=r=>{const p=pct(r.cum,r.annual);return `<tr><td class="td-desc">${r.name}</td><td>${r.annual.toLocaleString()}</td><td class="td-b">${(r.cum||0).toLocaleString()}</td><td>${mbar(p)}</td><td><span class="${statusClass(p)}">${statusLabel(p)}</span></td></tr>`;};
   document.getElementById('top-table').innerHTML=top.map(row).join('')||'<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:16px">Tiada data</td></tr>';
-  document.getElementById('risk-table').innerHTML=risk.map(row).join('')||'<tr><td colspan="5" style="text-align:center;color:var(--green);padding:16px">✅ Semua output on track!</td></tr>';
+  document.getElementById('risk-table').innerHTML=risk.map(row).join('')||'<tr><td colspan="5" style="text-align:center;color:var(--green);padding:16px">✅ Semua output capai sasaran!</td></tr>';
 }
 function renderCharts(){
   const kpiAll=[...D.kpi,...D.kpi3];
@@ -392,15 +406,16 @@ function renderOutcome(){
   document.getElementById('out2-grid').innerHTML=D.outcome.filter(o=>o.grp===2).map(card).join('');
 }
 function renderOutput(){
+  document.querySelector('#pane-output thead tr').innerHTML='<th style="min-width:250px">Indikator Output</th><th>PIC</th><th>Sasaran</th>'+['Jan','Feb','Mac','Apr','Mei','Jun','Julai','Ogo','Sep','Okt','Nov','Dis'].map(m=>`<th>${m}</th>`).join('')+'<th>Jumlah 2026</th><th style="min-width:100px">% Tahunan</th><th>Status</th>';
   document.getElementById('output-table').innerHTML=D.output.map(r=>{
-    if(r.grp) return `<tr class="grp"><td colspan="13">${r.grp}</td></tr>`;
+    if(r.grp) return `<tr class="grp"><td colspan="18">${r.grp}</td></tr>`;
     const p=pct(r.cum,r.annual);
-    return `<tr><td class="td-desc">${r.name}</td><td style="color:var(--muted)">${r.pic}</td><td>${r.annual?r.annual.toLocaleString():'—'}</td><td>${cell(r.jan)}</td><td>${cell(r.feb)}</td><td>${cell(r.mac)}</td><td>${cell(r.apr)}</td><td>${cell(r.mei)}</td><td>${cell(r.jun)}</td><td>${cell(r.jul)}</td><td class="td-b">${(r.cum||0).toLocaleString()}</td><td>${mbar(p)}</td><td>${p===null?'<span class="tm">DATA</span>':`<span class="${statusClass(p)}">${statusLabel(p)}</span>`}</td></tr>`;
+    return `<tr><td class="td-desc">${r.name}</td><td style="color:var(--muted)">${r.pic}</td><td>${r.annual?r.annual.toLocaleString():'—'}</td>${['jan','feb','mac','apr','mei','jun','jul','ogo','sep','okt','nov','dis'].map(m=>`<td>${cell(r[m])}</td>`).join('')}<td class="td-b">${(r.cum||0).toLocaleString()}</td><td>${mbar(p)}</td><td>${p===null?'<span class="tm">DATA</span>':`<span class="${statusClass(p)}">${statusLabel(p)}</span>`}</td></tr>`;
   }).join('');
 }
 function renderAll(){
-  document.getElementById('banner-period').textContent=D.period;
-  document.getElementById('banner-thr').textContent=thr();
+  document.getElementById('banner-period').textContent='Data '+D.period;
+  document.querySelectorAll('#pane-ringkasan thead tr').forEach(tr=>{tr.children[2].textContent='Jumlah 2026';});
   renderCards();renderTopRisk();renderKpi();renderQap();renderOutcome();renderOutput();renderCharts();
 }
 
@@ -458,8 +473,12 @@ function showSetup(extra){
 }
 async function loadAll(){
   const btn=document.getElementById('refreshBtn'); btn.disabled=true;
+  document.body.classList.add('data-loading');
   document.getElementById('lastUpd').textContent='⏳ Memuatkan…';
   document.getElementById('setup-msg').innerHTML='';
+  ['summary-cards','top-table','risk-table','kpi-pk1','kpi-pk3','qap-grid','qap-table','out1-grid','out2-grid','output-table'].forEach(id=>{document.getElementById(id).innerHTML='';});
+  document.getElementById('gaugeBig').textContent='—';
+  document.getElementById('gaugeSub').textContent='Memuatkan data';
   if(!CONFIG.SHEET_ID_DATA || CONFIG.SHEET_ID_DATA==='PASTE_SHEET_ID_DI_SINI'){ showSetup(); document.getElementById('lastUpd').textContent='⚠️ Belum dikonfigurasi'; btn.disabled=false; return; }
   const notes=[];
 
@@ -468,9 +487,11 @@ async function loadAll(){
     const dataRows = await gvizFetch(CONFIG.SHEET_ID_DATA, CONFIG.DATA_GID);
     D = buildD(dataRows);
     renderAll();
+    document.body.classList.remove('data-loading');
     notes.push(`DATA ✓ (${dataRows.length} baris)`);
   }catch(e){
     notes.push('DATA ✗ '+(e&&e.message?e.message:e));
+    ['gauge','kpi','output'].forEach(key=>{if(charts[key]){charts[key].destroy();delete charts[key];}});
   }
 
   // PELAN (Pelan Tindakan) — muat berasingan
