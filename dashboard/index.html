@@ -138,7 +138,7 @@ const CONFIG = {
   DATA_GID:       "1394180751", // tab cache dashboard (salinan automatik sumber induk)
   SHEET_ID_PELAN: "1J-rHCU5CWA0U5T4-EXv1ouZrkbDuMsr76vQvdSDzhO4",  // Pelan Tindakan
   PERIOD: "2026",
-  THRESHOLD: 100        // selaras dengan status sasaran tahunan dalam SKIPPF
+  THRESHOLD: null       // null = auto ikut bulan data terkini (bulan/12 × 100); isi nombor untuk tetapkan manual
 };
 </script>
 
@@ -170,7 +170,7 @@ const CONFIG = {
   <div id="setup-msg"></div>
 
   <div class="pane active" id="pane-ringkasan">
-    <div class="banner">ℹ️ <span><strong id="banner-period">Data 2026</strong>. Status capai dikira terhadap sasaran tahunan SKIPPF; kemas kini setiap bulan mungkin berbeza mengikut indikator.</span></div>
+    <div class="banner">ℹ️ <span><strong id="banner-period">Data 2026</strong>. Status dikira terhadap sasaran tahunan SKIPPF: <strong>≥100%</strong> capai, <strong>≥<span class="thr-lbl">75</span>%</strong> on track (jangkaan selepas <span id="banner-month">Sep</span>), bawah itu perhatian.</span></div>
     <div class="gauge-row">
       <div class="gaugecard"><h3>Output Capai Sasaran Tahunan</h3>
         <div class="gwrap"><canvas id="gaugeOverall" style="display: block; box-sizing: border-box; height: 150px; width: 202px;" width="304" height="225"></canvas><div class="gctr"><div class="big" id="gaugeBig">96%</div><div class="sub" id="gaugeSub">22/23 output</div></div></div>
@@ -188,7 +188,9 @@ const CONFIG = {
     </div>
     <div class="sec-hd"><span class="dot g"></span>Output Melebihi / Capai Sasaran (≥100%)</div>
     <div class="tbl-wrap"><table><thead><tr><th>Indikator</th><th>Sasaran</th><th>Jan–Julai</th><th>% Tahunan</th><th>Status</th></tr></thead><tbody id="top-table"><tr><td class="td-desc">Pemeriksaan AEB ke atas premis pemborong &amp; pengimport</td><td>7</td><td class="td-b">7</td><td><div class="mbar"><strong>100%</strong><div class="mb"><div class="mbf fill-g" style="width:100%"></div></div></div></td><td><span class="tg">CAPAI / MELEBIHI ✅</span></td></tr><tr><td class="td-desc">Pemeriksaan Khas pengimport/pengedar bahan prekursor</td><td>2</td><td class="td-b">2</td><td><div class="mbar"><strong>100%</strong><div class="mb"><div class="mbf fill-g" style="width:100%"></div></div></div></td><td><span class="tg">CAPAI / MELEBIHI ✅</span></td></tr><tr><td class="td-desc">Lesen Racun A,B,E / Permit NaOH / Psikotropik dikeluarkan</td><td>260</td><td class="td-b">491</td><td><div class="mbar"><strong>189%</strong><div class="mb"><div class="mbf fill-g" style="width:100%"></div></div></div></td><td><span class="tg">CAPAI / MELEBIHI ✅</span></td></tr><tr><td class="td-desc">Aduan diterima yang diambil tindakan</td><td>20</td><td class="td-b">22</td><td><div class="mbar"><strong>110%</strong><div class="mb"><div class="mbf fill-g" style="width:100%"></div></div></div></td><td><span class="tg">CAPAI / MELEBIHI ✅</span></td></tr><tr><td class="td-desc">Maklumbalas dikeluarkan kepada pengadu</td><td>15</td><td class="td-b">19</td><td><div class="mbar"><strong>127%</strong><div class="mb"><div class="mbf fill-g" style="width:100%"></div></div></div></td><td><span class="tg">CAPAI / MELEBIHI ✅</span></td></tr><tr><td class="td-desc">Maklumat berkualiti dibangunkan untuk tindakan</td><td>13</td><td class="td-b">13</td><td><div class="mbar"><strong>100%</strong><div class="mb"><div class="mbf fill-g" style="width:100%"></div></div></div></td><td><span class="tg">CAPAI / MELEBIHI ✅</span></td></tr><tr><td class="td-desc">Rampasan digital yang dijalankan</td><td>6</td><td class="td-b">6</td><td><div class="mbar"><strong>100%</strong><div class="mb"><div class="mbf fill-g" style="width:100%"></div></div></div></td><td><span class="tg">CAPAI / MELEBIHI ✅</span></td></tr><tr><td class="td-desc">Persampelan produk/kosmetik mengandungi elemen terlarang</td><td>14</td><td class="td-b">17</td><td><div class="mbar"><strong>121%</strong><div class="mb"><div class="mbf fill-g" style="width:100%"></div></div></div></td><td><span class="tg">CAPAI / MELEBIHI ✅</span></td></tr><tr><td class="td-desc">Bilangan kehadiran ke mahkamah untuk pendakwaan kes</td><td>59</td><td class="td-b">76</td><td><div class="mbar"><strong>129%</strong><div class="mb"><div class="mbf fill-g" style="width:100%"></div></div></div></td><td><span class="tg">CAPAI / MELEBIHI ✅</span></td></tr><tr><td class="td-desc">Bilangan bahan aktiviti kesedaran disediakan</td><td>17</td><td class="td-b">21</td><td><div class="mbar"><strong>124%</strong><div class="mb"><div class="mbf fill-g" style="width:100%"></div></div></div></td><td><span class="tg">CAPAI / MELEBIHI ✅</span></td></tr></tbody></table></div>
-    <div class="sec-hd"><span class="dot r"></span>Output Belum Capai Sasaran Tahunan</div>
+    <div class="sec-hd"><span class="dot a"></span>Output On Track (<span class="thr-lbl">75</span>% – 99%)</div>
+    <div class="tbl-wrap"><table><thead><tr><th>Indikator</th><th>Sasaran</th><th>Jan–Julai</th><th>% Tahunan</th><th>Status</th></tr></thead><tbody id="track-table"></tbody></table></div>
+    <div class="sec-hd"><span class="dot r"></span>Output Perhatian (di bawah <span class="thr-lbl">75</span>%)</div>
     <div class="tbl-wrap"><table><thead><tr><th>Indikator</th><th>Sasaran</th><th>Jan–Julai</th><th>% Tahunan</th><th>Status</th></tr></thead><tbody id="risk-table"><tr><td class="td-desc">Operasi khas ke atas bahan terkawal farmaseutikal</td><td>3</td><td class="td-b">1</td><td><div class="mbar"><strong>33%</strong><div class="mb"><div class="mbf fill-r" style="width:33%"></div></div></div></td><td><span class="tr">PERHATIAN ⚠️</span></td></tr></tbody></table></div>
   </div>
 
@@ -213,7 +215,7 @@ const CONFIG = {
   </div>
 
   <div class="pane" id="pane-output">
-    <div class="banner">ℹ️ OBB Output diukur dalam bilangan. Hijau = capai sasaran tahunan; merah = belum capai sasaran tahunan.</div>
+    <div class="banner">ℹ️ OBB Output diukur dalam bilangan. Hijau = capai sasaran tahunan; kuning = on track (≥<span class="thr-lbl">75</span>%); merah = perhatian.</div>
     <div class="tbl-wrap"><table><thead><tr>
       <th style="min-width:250px">Indikator Output</th><th>PIC</th><th>Sasaran</th>
       <th>Jan</th><th>Feb</th><th>Mac</th><th>Apr</th><th>Mei</th><th>Jun</th><th>Julai</th><th>Ogo</th><th>Sep</th><th>Okt</th><th>Nov</th><th>Dis</th><th>Jumlah 2026</th><th style="min-width:100px">% Tahunan</th><th>Status</th>
@@ -287,6 +289,9 @@ const KPI_TARGETS={"PK1-n1":80,"PK1-n2":95,"PK1-n3":85,"PK1-n4":85,"PK1-n5":80,"
 const QAP_TARGETS={QAP4:80,QAP5:50,QAP6:75,QAP7:95,QAP8:98};
 const pctTarget=v=>{const n=N(v);return n!==null&&n<=1?n*100:n;};
 
+const OUT_MONTHS=['jan','feb','mac','apr','mei','jun','jul','ogo','sep','okt','nov','dis'];
+const MONTH_NAMES=['Jan','Feb','Mac','Apr','Mei','Jun','Julai','Ogos','Sep','Okt','Nov','Dis'];
+
 /* ───── BINA STRUKTUR D DARI TAB DATA ───── */
 function buildD(rows){
   const d={kpi:[],kpi3:[],kpiInduk:[],qap:[],outcome:[],output:[],period:CONFIG.PERIOD,threshold:CONFIG.THRESHOLD};
@@ -311,16 +316,18 @@ function buildD(rows){
       d.output.push({id:S(r.id),name:S(r.nama),pic:S(r.pic),annual:N(r.sasaran),jan:N(r.jan),feb:N(r.feb),mac:N(r.mac),apr:N(r.apr),mei:N(r.mei),jun:N(r.jun),jul:N(r.jul),ogo:N(r.ogo),sep:N(r.sep),okt:N(r.okt),nov:N(r.nov),dis:N(r.dis),cum:N(r.jumlah)??N(r.janjun)});
     }
   });
+  d.month=OUT_MONTHS.reduce((m,k,i)=>d.output.some(r=>r.id&&r[k]!==null)?i+1:m,0);
+  if(!d.threshold&&d.month) d.threshold=Math.round(d.month/12*100);
   return d;
 }
 
 /* ───── HELPERS ───── */
 function pct(a,b){ return (a!==null&&b&&b>0)?(a/b)*100:null; }
 function thr(){ return D.threshold||50; }
-function statusClass(p){ return p>=100?'tg':'tr'; }
-function statusLabel(p){ return p>=100?'CAPAI / MELEBIHI ✅':'BELUM CAPAI SASARAN'; }
+function statusClass(p){ return p>=100?'tg':p>=thr()?'ta':'tr'; }
+function statusLabel(p){ return p>=100?'CAPAI / MELEBIHI ✅':p>=thr()?'ON TRACK 🟡':'PERHATIAN ⚠️'; }
 function cell(v){ return (v===null||v===undefined)?'<span style="color:var(--muted)">—</span>':v; }
-function fillClass(p){ return p>=100?'fill-g':'fill-r'; }
+function fillClass(p){ return p>=100?'fill-g':p>=thr()?'fill-a':'fill-r'; }
 function mbar(p){ if(p===null) return `<div class="mbar" style="color:var(--muted);font-style:italic;font-size:10px">—</div>`;
   return `<div class="mbar"><strong>${(Math.round(p*10)/10).toLocaleString('ms-MY')}%</strong><div class="mb"><div class="mbf ${fillClass(p)}" style="width:${Math.min(p,100)}%"></div></div></div>`; }
 function showTab(id,el){
@@ -336,7 +343,8 @@ function renderCards(){
   const ops=D.output.filter(r=>r.id&&r.annual);
   const achieved=ops.filter(r=>pct(r.cum,r.annual)>=100).length;
   const outputMissing=ops.filter(r=>r.cum===null).length;
-  const below=ops.length-achieved-outputMissing;
+  const onTrack=ops.filter(r=>{const p=pct(r.cum,r.annual);return p!==null&&p>=thr()&&p<100;}).length;
+  const below=ops.length-achieved-onTrack-outputMissing;
   const kpiAll=[...D.kpi,...D.kpi3];
   const kpiCap=kpiAll.filter(k=>k.pct!==null&&k.pct>=k.tgt).length;
   const kpiIndukCap=D.kpiInduk.filter(k=>k.pct!==null&&k.pct>=k.tgt).length;
@@ -354,7 +362,8 @@ function renderCards(){
     <div class="card g"><div class="lbl">QAP Capai Sasaran</div><div class="val">${cap}/${tot}</div><div class="sub">${cap} capai ✅${blm?` · ${blm} belum mula ⏸`:''}</div></div>
     <div class="card g"><div class="lbl">OBB Outcome</div><div class="val">${outCap}/${D.outcome.length}</div><div class="sub">Outcome ≥ sasaran ✅</div></div>
     <div class="card g"><div class="lbl">OBB Output Capai</div><div class="val">${achieved}/${ops.length}</div><div class="sub">Sasaran tahunan</div></div>
-    <div class="card r"><div class="lbl">OBB Output Bawah Sasaran</div><div class="val">${below}</div><div class="sub">Dalam usaha</div></div>`;
+    <div class="card a"><div class="lbl">Output On Track (≥${thr()}%)</div><div class="val">${onTrack}</div><div class="sub">Selari jangkaan ${MONTH_NAMES[D.month-1]||''}</div></div>
+    <div class="card r"><div class="lbl">Output Perhatian</div><div class="val">${below}</div><div class="sub">Di bawah ${thr()}% ⚠️</div></div>`;
   const pctCapai=ops.length?Math.round(achieved/ops.length*100):0;
   document.getElementById('gaugeBig').textContent=pctCapai+'%';
   document.getElementById('gaugeSub').textContent=achieved+'/'+ops.length+' output';
@@ -365,10 +374,11 @@ function renderCards(){
 }
 function renderTopRisk(){
   const ops=D.output.filter(r=>r.id&&r.annual);
-  const top=ops.filter(r=>pct(r.cum,r.annual)>=100), risk=ops.filter(r=>{const p=pct(r.cum,r.annual);return p!==null&&p<100;});
+  const top=ops.filter(r=>pct(r.cum,r.annual)>=100), track=ops.filter(r=>{const p=pct(r.cum,r.annual);return p!==null&&p>=thr()&&p<100;}), risk=ops.filter(r=>{const p=pct(r.cum,r.annual);return p!==null&&p<thr();});
   const row=r=>{const p=pct(r.cum,r.annual);return `<tr><td class="td-desc">${r.name}</td><td>${r.annual.toLocaleString()}</td><td class="td-b">${(r.cum||0).toLocaleString()}</td><td>${mbar(p)}</td><td><span class="${statusClass(p)}">${statusLabel(p)}</span></td></tr>`;};
   document.getElementById('top-table').innerHTML=top.map(row).join('')||'<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:16px">Tiada data</td></tr>';
-  document.getElementById('risk-table').innerHTML=risk.map(row).join('')||'<tr><td colspan="5" style="text-align:center;color:var(--green);padding:16px">✅ Semua output capai sasaran!</td></tr>';
+  document.getElementById('track-table').innerHTML=track.map(row).join('')||'<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:16px">Tiada</td></tr>';
+  document.getElementById('risk-table').innerHTML=risk.map(row).join('')||'<tr><td colspan="5" style="text-align:center;color:var(--green);padding:16px">✅ Semua output on track!</td></tr>';
 }
 function renderCharts(){
   const kpiAll=[...D.kpi,...D.kpi3];
@@ -415,6 +425,8 @@ function renderOutput(){
 }
 function renderAll(){
   document.getElementById('banner-period').textContent='Data '+D.period;
+  document.getElementById('banner-month').textContent=MONTH_NAMES[D.month-1]||'—';
+  document.querySelectorAll('.thr-lbl').forEach(e=>{e.textContent=thr();});
   document.querySelectorAll('#pane-ringkasan thead tr').forEach(tr=>{tr.children[2].textContent='Jumlah 2026';});
   renderCards();renderTopRisk();renderKpi();renderQap();renderOutcome();renderOutput();renderCharts();
 }
