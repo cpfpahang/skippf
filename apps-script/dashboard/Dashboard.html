@@ -1,0 +1,497 @@
+<!doctype html>
+<html lang="ms"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard Bersepadu CPF Pahang 2026</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.0/dist/chart.umd.js"></script>
+<style>
+:root{
+  --navy:#0a2a5b; --navy2:#0f3a73; --blue:#1760ad; --blue-bg:#eef5fb; --blue-mid:#bcd9f0;
+  --gold:#d13239; --gold-l:#c4d5ed; --accent:#d13239;
+  --green:#1e8e54; --green-bg:#e9f7ef; --green-mid:#9bdcb7;
+  --red:#c0392b; --red-bg:#fdecea; --red-mid:#f3c3bd;
+  --amber:#d99413; --amber-bg:#fef6e7; --amber-mid:#f6d99a;
+  --bg:#eef2f7; --card:#ffffff; --border:#e7ecf3;
+  --text:#16202b; --muted:#62707f; --faint:#f7f9fc;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Segoe UI',-apple-system,system-ui,Roboto,Arial,sans-serif;background:var(--bg);color:var(--text);font-size:13px;
+  background-image:radial-gradient(circle at 10% 0%,rgba(31,111,178,.05),transparent 40%),radial-gradient(circle at 92% 6%,rgba(201,162,39,.05),transparent 38%);}
+.hdr{position:relative;background:linear-gradient(135deg,var(--navy),var(--navy2) 60%,#16487d);color:#fff;
+  padding:20px 26px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;
+  box-shadow:0 8px 24px rgba(10,43,78,.28);overflow:hidden;}
+.hdr::after{content:"";position:absolute;left:26px;bottom:0;width:110px;height:4px;background:var(--accent);}
+.hdr-left{display:flex;align-items:center;gap:15px;position:relative;}
+.brand-logo{display:block;width:50px;height:50px;object-fit:contain;flex:none;box-sizing:border-box;
+  background:var(--navy);border-radius:10px;padding:0;box-shadow:0 2px 10px rgba(0,0,0,.14);}
+@media(max-width:640px){.hdr{padding:16px 18px 18px}.hdr::after{left:18px}.hdr-left{gap:12px}.brand-logo{width:40px;height:40px}.hdr h1{font-size:16px}.hdr p{display:none}
+  .hdr-right{width:100%;display:flex;flex-direction:row-reverse;justify-content:space-between;align-items:center;text-align:left}.last-update{margin-top:0}}
+.kick{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--gold-l);font-weight:700;}
+.hdr h1{font-size:18px;font-weight:800;margin-top:2px;}
+.hdr p{font-size:11px;opacity:.82;margin-top:3px;}
+.hdr-right{text-align:right;position:relative;}
+.refresh-btn{background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.3);color:#fff;border-radius:22px;padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;transition:.2s;}
+.refresh-btn:hover{background:#fff;border-color:#fff;color:var(--navy);}
+.refresh-btn{display:inline-flex;align-items:center;gap:7px;min-height:40px}
+.refresh-btn:disabled{opacity:.5;cursor:not-allowed;}
+.live-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:#4ade80;margin-right:5px;animation:pulse 2s infinite;}
+.last-update{font-size:11px;opacity:.7;margin-top:6px;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+.tabs{background:#fff;border-bottom:1px solid var(--border);display:flex;padding:0 18px;gap:2px;position:sticky;top:0;z-index:50;box-shadow:0 3px 10px rgba(10,43,78,.06);overflow-x:auto;}
+.tab{display:inline-flex;align-items:center;gap:7px;padding:13px 16px;min-height:46px;cursor:pointer;font-family:inherit;font-weight:700;font-size:12.5px;color:var(--muted);background:none;border:0;border-bottom:3px solid transparent;transition:.15s;white-space:nowrap;}
+.tab:focus-visible,.refresh-btn:focus-visible,.pt-fbtn:focus-visible{outline:3px solid #d89b24;outline-offset:2px;}
+.ic{width:16px;height:16px;flex:none;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.tab:hover{color:var(--navy);} .tab.active{color:var(--navy);border-bottom-color:var(--accent);}
+.main{padding:22px 24px;max-width:1400px;margin:0 auto;}
+.pane{display:none;} .pane.active{display:block;}
+.banner{background:var(--blue-bg);border:1px solid var(--blue-mid);border-radius:10px;padding:10px 15px;font-size:12px;color:#10487f;margin-bottom:18px;display:flex;align-items:center;gap:8px;}
+.banner.warn{background:var(--amber-bg);border-color:var(--amber-mid);color:#92600c;}
+.gauge-row{display:grid;grid-template-columns:240px 1fr;gap:16px;margin-bottom:18px;}
+@media(max-width:780px){.gauge-row{grid-template-columns:1fr;}}
+.gaugecard{background:var(--card);border-radius:14px;padding:18px;box-shadow:0 4px 16px rgba(10,43,78,.07);border:1px solid var(--border);border-top:4px solid var(--navy);text-align:center;display:flex;flex-direction:column;justify-content:center;}
+.gaugecard h3{font-size:11px;letter-spacing:1.4px;text-transform:uppercase;color:var(--muted);font-weight:700;margin-bottom:6px;}
+.gwrap{position:relative;height:150px;}
+.gctr{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none;}
+.gctr .big{font-size:38px;font-weight:800;color:var(--navy);line-height:1;}
+.gctr .sub{font-size:11px;color:var(--muted);margin-top:3px;font-weight:600;}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin-bottom:22px;}
+.card{position:relative;background:var(--card);border-radius:12px;padding:16px;box-shadow:0 4px 14px rgba(10,43,78,.06);border:1px solid var(--border);border-left:4px solid var(--blue);transition:.18s;}
+.card:hover{transform:translateY(-2px);box-shadow:0 10px 22px rgba(10,43,78,.11);}
+.card.g{border-left-color:var(--green);} .card.r{border-left-color:var(--red);} .card.a{border-left-color:var(--amber);} .card.m{border-left-color:var(--muted);}
+.card .lbl{font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.4px;}
+.card .val{font-size:27px;font-weight:800;color:var(--text);margin:4px 0 2px;}
+.card .sub{font-size:11px;color:var(--muted);}
+.chart-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:22px;}
+@media(max-width:780px){.chart-row{grid-template-columns:1fr;}}
+.chart-box{background:var(--card);border-radius:14px;padding:18px;box-shadow:0 4px 16px rgba(10,43,78,.07);border:1px solid var(--border);}
+.chart-box h3{font-size:12px;font-weight:800;color:var(--navy);margin-bottom:14px;display:flex;align-items:center;gap:7px;}
+.chart-box h3::before{content:"";width:4px;height:14px;background:var(--accent);border-radius:3px;display:inline-block;}
+.chart-box canvas{max-height:260px;}
+.sec-hd{font-size:13px;font-weight:800;color:var(--navy);border-bottom:2px solid var(--border);padding-bottom:8px;margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+.sec-hd .dot{width:9px;height:9px;border-radius:50%;background:var(--blue);flex-shrink:0;}
+.sec-hd .dot.g{background:var(--green);} .sec-hd .dot.a{background:var(--amber);} .sec-hd .dot.r{background:var(--red);}
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(285px,1fr));gap:13px;margin-bottom:22px;}
+.kpi-card{background:var(--card);border-radius:12px;padding:15px;box-shadow:0 3px 12px rgba(10,43,78,.06);border:1px solid var(--border);transition:.16s;}
+.kpi-card:hover{box-shadow:0 8px 20px rgba(10,43,78,.10);transform:translateY(-2px);}
+.kpi-id{font-size:11px;font-weight:800;color:var(--navy);background:var(--blue-bg);border-radius:6px;padding:3px 9px;display:inline-block;margin-bottom:7px;border:1px solid var(--blue-mid);}
+.kpi-id.qap{color:#0a5c3a;background:#d9f3e6;border-color:var(--green-mid);}
+.kpi-name{font-size:11px;color:var(--text);line-height:1.5;margin-bottom:10px;min-height:32px;}
+.kpi-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;}
+.kpi-tgt{font-size:11px;color:var(--muted);} .kpi-pct{font-size:21px;font-weight:800;}
+.pg{color:var(--green);} .pa{color:var(--amber);} .pr{color:var(--red);}
+.prog{height:8px;background:#eef1f4;border-radius:5px;overflow:hidden;margin-bottom:6px;}
+.prog-fill{height:100%;border-radius:5px;transition:width .6s ease;}
+.fill-g{background:linear-gradient(90deg,#16834e,#26b56c);} .fill-a{background:linear-gradient(90deg,#c5850f,#eaa72c);}
+.fill-r{background:linear-gradient(90deg,#b3342a,#e26458);} .fill-m{background:linear-gradient(90deg,#8794a3,#c2ccd6);}
+.badge{font-size:11px;font-weight:800;padding:3px 9px;border-radius:11px;display:inline-block;margin-top:2px;}
+.bg{background:var(--green-bg);color:var(--green);} .ba{background:var(--amber-bg);color:var(--amber);}
+.br{background:var(--red-bg);color:var(--red);} .bm{background:#eef1f4;color:var(--muted);}
+.tbl-wrap{background:var(--card);border-radius:12px;overflow:hidden;box-shadow:0 4px 14px rgba(10,43,78,.07);margin-bottom:22px;overflow-x:auto;border:1px solid var(--border);}
+table{width:100%;border-collapse:collapse;min-width:800px;}
+thead th{background:var(--navy);color:#fff;padding:11px 12px;font-size:11px;font-weight:700;text-align:left;white-space:nowrap;}
+thead th:not(:first-child){text-align:center;}
+tbody tr:nth-child(even){background:var(--faint);}
+tbody tr:hover{background:var(--blue-bg);}
+tbody td{padding:9px 12px;border-bottom:1px solid #f1f4f8;font-size:11px;vertical-align:middle;}
+tbody td:not(:first-child){text-align:center;}
+.td-desc{color:var(--text);line-height:1.4;text-align:left !important;max-width:260px;} .td-b{font-weight:700;}
+.grp td{background:#eaf1f8 !important;color:var(--navy);font-weight:800;font-size:11px;padding:8px 12px;border-bottom:2px solid var(--blue-mid);text-transform:uppercase;letter-spacing:.3px;text-align:left !important;}
+.mbar{min-width:70px;} .mb{height:5px;background:#eef1f4;border-radius:3px;overflow:hidden;margin-top:3px;} .mbf{height:100%;border-radius:3px;}
+.tg{background:var(--green-bg);color:var(--green);font-size:11px;font-weight:800;padding:2px 7px;border-radius:8px;white-space:nowrap;display:inline-block;}
+.ta{background:var(--amber-bg);color:var(--amber);font-size:11px;font-weight:800;padding:2px 7px;border-radius:8px;white-space:nowrap;display:inline-block;}
+.tr{background:var(--red-bg);color:var(--red);font-size:11px;font-weight:800;padding:2px 7px;border-radius:8px;white-space:nowrap;display:inline-block;}
+.tm{background:#eef1f4;color:var(--muted);font-size:11px;font-weight:800;padding:2px 7px;border-radius:8px;white-space:nowrap;display:inline-block;}
+.pt-controls{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;align-items:center;}
+.pt-controls input{flex:1;min-width:170px;padding:10px 13px;border:1px solid #d3dce6;border-radius:10px;font-size:13px;background:#fbfcfe;}
+.pt-fbtn{padding:8px 14px;border:1px solid #d3dce6;background:#fff;border-radius:22px;font-size:12px;cursor:pointer;font-weight:700;color:var(--muted);transition:.15s;}
+.pt-fbtn:hover{border-color:var(--blue);color:var(--blue);}
+.pt-fbtn.active{background:linear-gradient(135deg,var(--navy),var(--blue));color:#fff;border-color:var(--navy);}
+.pt-item{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:15px 16px;margin-bottom:10px;border-left:5px solid #ccc;box-shadow:0 3px 10px rgba(10,43,78,.05);transition:.15s;}
+.pt-item:hover{box-shadow:0 6px 16px rgba(10,43,78,.10);transform:translateX(2px);}
+.pt-item[data-s="Selesai"]{border-left-color:var(--green);} .pt-item[data-s="Dalam Proses"]{border-left-color:var(--amber);}
+.pt-item[data-s="Belum Mula"]{border-left-color:var(--muted);} .pt-item[data-s="Ditangguh"]{border-left-color:var(--red);}
+.pt-top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;}
+.pt-ttl{font-size:13px;font-weight:700;} .pt-ttl .no{color:var(--blue);font-weight:800;}
+.pt-sek{font-size:11px;color:var(--muted);margin:5px 0 9px;}
+.pt-meta{display:flex;flex-wrap:wrap;gap:14px;font-size:11px;color:var(--muted);margin-top:10px;} .pt-meta b{color:var(--text);}
+.pt-note{font-size:11px;margin-top:10px;padding:8px 11px;border-radius:8px;}
+.pt-note.fb{background:var(--blue-bg);color:#10487f;border:1px solid var(--blue-mid);} .pt-note.hl{background:var(--red-bg);color:var(--red);border:1px solid var(--red-mid);}
+.spinner{width:38px;height:38px;border:3px solid var(--border);border-top-color:var(--blue);border-radius:50%;animation:spin .7s linear infinite;margin:40px auto;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.setup{max-width:680px;margin:30px auto;background:#fff;border:1px solid var(--border);border-radius:14px;padding:24px;box-shadow:0 4px 16px rgba(10,43,78,.08);}
+.setup h2{color:var(--navy);font-size:16px;margin-bottom:10px;} .setup code{background:#f1f4f8;padding:2px 6px;border-radius:5px;font-size:12px;}
+.setup ol{margin:12px 0 0 18px;line-height:1.9;font-size:12.5px;}
+footer{text-align:center;padding:18px;color:var(--muted);font-size:11px;border-top:1px solid var(--border);margin-top:8px;}
+body.data-loading #pane-ringkasan,body.data-loading #pane-kpi,body.data-loading #pane-qap,body.data-loading #pane-outcome,body.data-loading #pane-output{visibility:hidden}
+</style>
+</head>
+<body class="data-loading">
+<noscript><div class="banner">Aktifkan JavaScript untuk memuatkan data dashboard semasa.</div></noscript>
+
+<!-- Sumber data ditetapkan dalam DashboardCode.gs (DASH). Sheet tidak perlu dikongsi umum. -->
+<script>
+const CONFIG = {
+  PERIOD: "2026",
+  THRESHOLD: null       // null = auto ikut bulan data terkini (bulan/12 × 100); isi nombor untuk tetapkan manual
+};
+</script>
+
+<div class="hdr">
+  <div class="hdr-left">
+    <img class="brand-logo" src="https://cpfpahang.github.io/skippf/icon-192.png?v=20260907" alt="Logo S SKIPPF" width="50" height="50">
+    <div>
+      <div class="kick">Kementerian Kesihatan Malaysia</div>
+      <h1>Dashboard Bersepadu CPF Pahang 2026</h1>
+      <p>KPI · QAP · OBB · Pelan Tindakan — Cawangan Penguatkuasaan Farmasi Pahang, JKN Pahang</p>
+    </div>
+  </div>
+  <div class="hdr-right">
+    <button class="refresh-btn" id="refreshBtn" onclick="loadAll()"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11a8 8 0 1 0-2.3 5.7M20 4v7h-7"/></svg>Refresh Data</button>
+    <div class="last-update"><span class="live-dot"></span><span id="lastUpd">Memuatkan…</span></div>
+  </div>
+</div>
+
+<nav class="tabs" aria-label="Bahagian dashboard">
+  <button type="button" class="tab active" aria-current="page" onclick="showTab('ringkasan',this)"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11 12 4l8 7v9h-5v-6H9v6H4z"/></svg>Ringkasan</button>
+  <button type="button" class="tab" onclick="showTab('kpi',this)"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19h16M7 15V9m5 6V5m5 10v-7"/></svg>KPI</button>
+  <button type="button" class="tab" onclick="showTab('qap',this)"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 8 3v6c0 5-8 9-8 9s-8-4-8-9V6zM8 12l3 3 5-6"/></svg>QAP</button>
+  <button type="button" class="tab" onclick="showTab('outcome',this)"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r=".6"/></svg>OBB Outcome</button>
+  <button type="button" class="tab" onclick="showTab('output',this)"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 3H5v18h14V8zM14 3v5h5M8 12h8m-8 4h6"/></svg>OBB Output</button>
+  <button type="button" class="tab" onclick="showTab('pelan',this)"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16v14H4zM4 10h16M8 3v5m8-5v5"/></svg>Pelan Tindakan</button>
+</nav>
+
+<div class="main" id="main">
+  <div id="setup-msg"></div>
+
+  <div class="pane active" id="pane-ringkasan">
+    <div class="banner"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v6m0-9.5v.5"/></svg> <span><strong id="banner-period">Data 2026</strong>. Status dikira terhadap sasaran tahunan SKIPPF: <strong>≥100%</strong> capai, <strong>≥<span class="thr-lbl">75</span>%</strong> on track (jangkaan selepas <span id="banner-month">Sep</span>), bawah itu perhatian.</span></div>
+    <div class="gauge-row">
+      <div class="gaugecard"><h3>Output Capai Sasaran Tahunan</h3>
+        <div class="gwrap"><canvas id="gaugeOverall"></canvas><div class="gctr"><div class="big" id="gaugeBig">—</div><div class="sub" id="gaugeSub">Memuatkan data</div></div></div>
+      </div>
+      <div class="cards" id="summary-cards" style="margin-bottom:0"></div>
+    </div>
+    <div class="chart-row">
+      <div class="chart-box"><h3>Pencapaian KPI &amp; QAP vs Sasaran</h3><canvas id="chartKpi"></canvas></div>
+      <div class="chart-box"><h3>OBB Output — % Sasaran Tahunan</h3><canvas id="chartOutput"></canvas></div>
+    </div>
+    <div class="sec-hd"><span class="dot g"></span>Output Melebihi / Capai Sasaran (≥100%)</div>
+    <div class="tbl-wrap"><table><thead><tr><th>Indikator</th><th>Sasaran</th><th>Jan–Julai</th><th>% Tahunan</th><th>Status</th></tr></thead><tbody id="top-table"></tbody></table></div>
+    <div class="sec-hd"><span class="dot a"></span>Output On Track (<span class="thr-lbl">75</span>% – 99%)</div>
+    <div class="tbl-wrap"><table><thead><tr><th>Indikator</th><th>Sasaran</th><th>Jan–Julai</th><th>% Tahunan</th><th>Status</th></tr></thead><tbody id="track-table"></tbody></table></div>
+    <div class="sec-hd"><span class="dot r"></span>Output Perhatian (di bawah <span class="thr-lbl">75</span>%)</div>
+    <div class="tbl-wrap"><table><thead><tr><th>Indikator</th><th>Sasaran</th><th>Jan–Julai</th><th>% Tahunan</th><th>Status</th></tr></thead><tbody id="risk-table"></tbody></table></div>
+  </div>
+
+  <div class="pane" id="pane-kpi">
+    <div class="sec-hd"><span class="dot"></span>KPI Penguatkuasaan Dalam Talian (PK1)</div>
+    <div class="kpi-grid" id="kpi-pk1"></div>
+    <div class="sec-hd"><span class="dot"></span>KPI Pelesenan &amp; Pemeriksaan (PK3)</div>
+    <div class="kpi-grid" id="kpi-pk3"></div>
+  </div>
+
+  <div class="pane" id="pane-qap">
+    <div class="sec-hd"><span class="dot g"></span>Quality Assurance Programme (QAP)</div>
+    <div class="kpi-grid" id="qap-grid"></div>
+    <div class="tbl-wrap"><table><thead><tr><th>QAP</th><th>Standard</th><th>Jan–Mac</th><th>Apr–Jun</th><th>Jul–Sept</th><th>Semasa</th><th>Status</th></tr></thead><tbody id="qap-table"></tbody></table></div>
+  </div>
+
+  <div class="pane" id="pane-outcome">
+    <div class="sec-hd"><span class="dot g"></span>Outcome 1 — Pematuhan kepada Peruntukan UU</div>
+    <div class="kpi-grid" id="out1-grid"></div>
+    <div class="sec-hd"><span class="dot g"></span>Outcome 2 — Perkhidmatan Penguatkuasaan Berkesan &amp; Efisien</div>
+    <div class="kpi-grid" id="out2-grid"></div>
+  </div>
+
+  <div class="pane" id="pane-output">
+    <div class="banner"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v6m0-9.5v.5"/></svg> OBB Output diukur dalam bilangan. Hijau = capai sasaran tahunan; kuning = on track (≥<span class="thr-lbl">75</span>%); merah = perhatian.</div>
+    <div class="tbl-wrap"><table><thead><tr>
+      <th style="min-width:250px">Indikator Output</th><th>PIC</th><th>Sasaran</th>
+      <th>Jan</th><th>Feb</th><th>Mac</th><th>Apr</th><th>Mei</th><th>Jun</th><th>Julai</th><th>Ogo</th><th>Sep</th><th>Okt</th><th>Nov</th><th>Dis</th><th>Jumlah 2026</th><th style="min-width:100px">% Tahunan</th><th>Status</th>
+    </tr></thead><tbody id="output-table"></tbody></table></div>
+  </div>
+
+  <div class="pane" id="pane-pelan">
+    <div class="cards" id="pt-cards"></div>
+    <div class="chart-box" style="max-width:420px;margin:0 auto 22px"><h3>Taburan Status Inisiatif</h3><canvas id="ptStatChart"></canvas></div>
+    <div class="sec-hd"><span class="dot"></span>Senarai Inisiatif</div>
+    <div class="pt-controls">
+      <input id="pt-search" type="search" aria-label="Cari inisiatif atau seksyen" placeholder="Cari inisiatif / seksyen…">
+      <button class="pt-fbtn active" data-f="all">Semua</button>
+      <button class="pt-fbtn" data-f="Selesai">Selesai</button>
+      <button class="pt-fbtn" data-f="Dalam Proses">Dalam Proses</button>
+      <button class="pt-fbtn" data-f="Belum Mula">Belum Mula</button>
+      <button class="pt-fbtn" data-f="Ditangguh">Ditangguh</button>
+    </div>
+    <div id="pt-list"></div>
+  </div>
+</div>
+
+<footer>Cawangan Penguatkuasa Farmasi Pahang &nbsp;·&nbsp; JKN Pahang &nbsp;·&nbsp; KKM &nbsp;·&nbsp; Untuk kegunaan dalaman, akaun @moh.gov.my sahaja</footer>
+
+<script>
+Chart.defaults.font.family=getComputedStyle(document.body).fontFamily;Chart.defaults.color='#5b6c80';
+let D = {kpi:[],kpi3:[],kpiInduk:[],qap:[],outcome:[],output:[],period:CONFIG.PERIOD,threshold:CONFIG.THRESHOLD};
+let PT_DATA=[], charts={}, ptFilter='all', ptQ='';
+
+/* ───── DATA DARI PELAYAN (akaun @moh.gov.my sahaja) ───── */
+function fetchRows(which){
+  return new Promise((resolve,reject)=>{
+    google.script.run
+      .withSuccessHandler(resolve)
+      .withFailureHandler(e=>reject(new Error(e&&e.message?e.message:String(e))))
+      .getDashboardRows(which);
+  });
+}
+const N = v => {
+  if(v===''||v===null||v===undefined) return null;
+  const m=String(v).replace(/,/g,'').match(/-?\d+(?:\.\d+)?/);
+  return m?Number(m[0]):null;
+};
+const S = v => (v===null||v===undefined)?'':String(v).trim();
+const KPI_TARGETS={"PK1-n1":80,"PK1-n2":95,"PK1-n3":85,"PK1-n4":85,"PK1-n5":80,"PK3-n1":95,"PK3-n2":85};
+const QAP_TARGETS={QAP4:80,QAP5:50,QAP6:75,QAP7:95,QAP8:98};
+const pctTarget=v=>{const n=N(v);return n!==null&&n<=1?n*100:n;};
+
+const OUT_MONTHS=['jan','feb','mac','apr','mei','jun','jul','ogo','sep','okt','nov','dis'];
+const MONTH_NAMES=['Jan','Feb','Mac','Apr','Mei','Jun','Julai','Ogos','Sep','Okt','Nov','Dis'];
+
+/* ───── BINA STRUKTUR D DARI TAB DATA ───── */
+function buildD(rows){
+  const d={kpi:[],kpi3:[],kpiInduk:[],qap:[],outcome:[],output:[],period:CONFIG.PERIOD,threshold:CONFIG.THRESHOLD};
+  rows.forEach(r=>{
+    const bhg=S(r.bahagian).toUpperCase();
+    if(bhg==='KPI'){
+      const id=S(r.id);
+      if(!/-n\d+$/i.test(id)){
+        d.kpiInduk.push({id,tgt:N(r.sasaran),pct:N(r.pencapaian)});
+        return;
+      }
+      const o={id,name:S(r.nama),tgt:pctTarget(r.sasaran)??KPI_TARGETS[id],pct:N(r.pencapaian),num:N(r.num),den:N(r.den)};
+      (S(r.kumpulan).toUpperCase().includes('PK3')?d.kpi3:d.kpi).push(o);
+    } else if(bhg==='QAP'){
+      const id=S(r.id);
+      d.qap.push({id,name:S(r.nama),std:pctTarget(r.sasaran)??QAP_TARGETS[id],janMac:N(r.janMac),aprJun:N(r.aprJun),julSep:N(r.julSep),pct:N(r.pencapaian),num:N(r.num),den:N(r.den),pic:S(r.pic)});
+    } else if(bhg==='OUTCOME'){
+      d.outcome.push({id:S(r.id),grp:N(r.kumpulan)||1,name:S(r.nama),tgt:pctTarget(r.sasaran),pct:N(r.pencapaian),num:N(r.num),den:N(r.den),pic:S(r.pic),numLbl:S(r.numLbl),denLbl:S(r.denLbl)});
+    } else if(bhg==='OUTPUT_GRP'){
+      d.output.push({grp:S(r.nama)});
+    } else if(bhg==='OUTPUT'){
+      d.output.push({id:S(r.id),name:S(r.nama),pic:S(r.pic),annual:N(r.sasaran),jan:N(r.jan),feb:N(r.feb),mac:N(r.mac),apr:N(r.apr),mei:N(r.mei),jun:N(r.jun),jul:N(r.jul),ogo:N(r.ogo),sep:N(r.sep),okt:N(r.okt),nov:N(r.nov),dis:N(r.dis),cum:N(r.jumlah)??N(r.janjun)});
+    }
+  });
+  d.month=OUT_MONTHS.reduce((m,k,i)=>d.output.some(r=>r.id&&r[k]!==null)?i+1:m,0);
+  if(!d.threshold&&d.month) d.threshold=Math.round(d.month/12*100);
+  return d;
+}
+
+/* ───── HELPERS ───── */
+function pct(a,b){ return (a!==null&&b&&b>0)?(a/b)*100:null; }
+function thr(){ return D.threshold||50; }
+function statusClass(p){ return p>=100?'tg':p>=thr()?'ta':'tr'; }
+function statusLabel(p){ return p>=100?'CAPAI / MELEBIHI ✅':p>=thr()?'ON TRACK 🟡':'PERHATIAN ⚠️'; }
+function cell(v){ return (v===null||v===undefined)?'<span style="color:var(--muted)">—</span>':v; }
+function fillClass(p){ return p>=100?'fill-g':p>=thr()?'fill-a':'fill-r'; }
+function mbar(p){ if(p===null) return `<div class="mbar" style="color:var(--muted);font-style:italic;font-size:11px">—</div>`;
+  return `<div class="mbar"><strong>${(Math.round(p*10)/10).toLocaleString('ms-MY')}%</strong><div class="mb"><div class="mbf ${fillClass(p)}" style="width:${Math.min(p,100)}%"></div></div></div>`; }
+function showTab(id,el){
+  document.querySelectorAll('.pane').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>{t.classList.remove('active');t.removeAttribute('aria-current');});
+  document.getElementById('pane-'+id).classList.add('active'); el.classList.add('active'); el.setAttribute('aria-current','page');
+  if(id==='ringkasan') renderCharts();
+  if(id==='pelan') drawPtCharts();
+}
+
+/* ───── RENDER (sama seperti versi Cowork) ───── */
+function renderCards(){
+  const ops=D.output.filter(r=>r.id&&r.annual);
+  const achieved=ops.filter(r=>pct(r.cum,r.annual)>=100).length;
+  const outputMissing=ops.filter(r=>r.cum===null).length;
+  const onTrack=ops.filter(r=>{const p=pct(r.cum,r.annual);return p!==null&&p>=thr()&&p<100;}).length;
+  const below=ops.length-achieved-onTrack-outputMissing;
+  const kpiAll=[...D.kpi,...D.kpi3];
+  const kpiCap=kpiAll.filter(k=>k.pct!==null&&k.pct>=k.tgt).length;
+  const kpiIndukCap=D.kpiInduk.filter(k=>k.pct!==null&&k.pct>=k.tgt).length;
+  const cap=D.qap.filter(q=>q.pct!==null&&q.pct>=q.std).length, tot=D.qap.length, blm=D.qap.filter(q=>q.pct===null).length;
+  const outCap=D.outcome.filter(o=>o.pct!==null&&o.pct>=o.tgt).length;
+  const total=kpiAll.length+D.kpiInduk.length+tot+D.outcome.length+ops.length;
+  const totalCap=kpiCap+kpiIndukCap+cap+outCap+achieved;
+  const totalBelum=blm+outputMissing+kpiAll.filter(k=>k.pct===null).length+D.kpiInduk.filter(k=>k.pct===null).length+D.outcome.filter(o=>o.pct===null).length;
+  document.getElementById('summary-cards').innerHTML=`
+    <div class="card"><div class="lbl">Jumlah Indikator SKIPPF</div><div class="val">${total}</div><div class="sub">KPI · QAP · OBB</div></div>
+    <div class="card g"><div class="lbl">Capai Sasaran</div><div class="val">${totalCap}</div><div class="sub">Sasaran tahunan</div></div>
+    <div class="card r"><div class="lbl">Bawah Sasaran</div><div class="val">${total-totalCap-totalBelum}</div><div class="sub">Dalam usaha</div></div>
+    <div class="card m"><div class="lbl">Belum Lengkap</div><div class="val">${totalBelum}</div><div class="sub">Tiada pencapaian</div></div>
+    <div class="card g"><div class="lbl">KPI Capai Sasaran</div><div class="val">${kpiCap}/${kpiAll.length}</div><div class="sub">Penanda KPI ✅</div></div>
+    <div class="card g"><div class="lbl">QAP Capai Sasaran</div><div class="val">${cap}/${tot}</div><div class="sub">${cap} capai ✅${blm?` · ${blm} belum mula ⏸`:''}</div></div>
+    <div class="card g"><div class="lbl">OBB Outcome</div><div class="val">${outCap}/${D.outcome.length}</div><div class="sub">Outcome ≥ sasaran ✅</div></div>
+    <div class="card g"><div class="lbl">OBB Output Capai</div><div class="val">${achieved}/${ops.length}</div><div class="sub">Sasaran tahunan</div></div>
+    <div class="card a"><div class="lbl">Output On Track (≥${thr()}%)</div><div class="val">${onTrack}</div><div class="sub">Selari jangkaan ${MONTH_NAMES[D.month-1]||''}</div></div>
+    <div class="card r"><div class="lbl">Output Perhatian</div><div class="val">${below}</div><div class="sub">Di bawah ${thr()}% ⚠️</div></div>`;
+  const pctCapai=ops.length?Math.round(achieved/ops.length*100):0;
+  document.getElementById('gaugeBig').textContent=pctCapai+'%';
+  document.getElementById('gaugeSub').textContent=achieved+'/'+ops.length+' output';
+  if(charts.gauge) charts.gauge.destroy();
+  charts.gauge=new Chart(document.getElementById('gaugeOverall'),{type:'doughnut',
+    data:{datasets:[{data:[pctCapai,Math.max(0,100-pctCapai)],backgroundColor:['#1e8e54','#eef1f4'],borderWidth:0,circumference:270,rotation:225}]},
+    options:{responsive:true,maintainAspectRatio:false,cutout:'76%',plugins:{legend:{display:false},tooltip:{enabled:false}}}});
+}
+function renderTopRisk(){
+  const ops=D.output.filter(r=>r.id&&r.annual);
+  const top=ops.filter(r=>pct(r.cum,r.annual)>=100), track=ops.filter(r=>{const p=pct(r.cum,r.annual);return p!==null&&p>=thr()&&p<100;}), risk=ops.filter(r=>{const p=pct(r.cum,r.annual);return p!==null&&p<thr();});
+  const row=r=>{const p=pct(r.cum,r.annual);return `<tr><td class="td-desc">${r.name}</td><td>${r.annual.toLocaleString()}</td><td class="td-b">${(r.cum||0).toLocaleString()}</td><td>${mbar(p)}</td><td><span class="${statusClass(p)}">${statusLabel(p)}</span></td></tr>`;};
+  document.getElementById('top-table').innerHTML=top.map(row).join('')||'<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:16px">Tiada data</td></tr>';
+  document.getElementById('track-table').innerHTML=track.map(row).join('')||'<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:16px">Tiada</td></tr>';
+  document.getElementById('risk-table').innerHTML=risk.map(row).join('')||'<tr><td colspan="5" style="text-align:center;color:var(--green);padding:16px">✅ Semua output on track!</td></tr>';
+}
+function renderCharts(){
+  const kpiAll=[...D.kpi,...D.kpi3];
+  if(charts.kpi) charts.kpi.destroy();
+  charts.kpi=new Chart(document.getElementById('chartKpi').getContext('2d'),{type:'bar',
+    data:{labels:[...kpiAll.map(k=>k.id),...D.qap.map(q=>q.id)],datasets:[
+      {label:'Pencapaian (%)',data:[...kpiAll.map(k=>k.pct),...D.qap.map(q=>q.pct)],backgroundColor:'rgba(30,142,84,.85)',borderRadius:5},
+      {label:'Sasaran (%)',data:[...kpiAll.map(k=>k.tgt),...D.qap.map(q=>q.std)],backgroundColor:'rgba(10,43,78,.18)',borderRadius:5}]},
+    options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{position:'bottom',labels:{font:{size:11}}},tooltip:{callbacks:{label:c=>c.dataset.label+': '+(c.raw??'N/A')+'%'}}},scales:{y:{min:0,max:115,ticks:{callback:v=>v+'%',font:{size:11}},grid:{color:'#f0f3f7'}},x:{ticks:{font:{size:11}}}}}});
+  const ops=D.output.filter(r=>r.id&&r.annual), opPcts=ops.map(r=>pct(r.cum,r.annual));
+  if(charts.out) charts.out.destroy();
+  charts.out=new Chart(document.getElementById('chartOutput').getContext('2d'),{type:'bar',
+    data:{labels:ops.map(r=>r.name.length>30?r.name.substring(0,28)+'…':r.name),datasets:[{label:'% Sasaran Tahunan',data:opPcts,backgroundColor:opPcts.map(p=>p>=100?'rgba(30,142,84,.8)':p>=thr()?'rgba(217,148,19,.8)':'rgba(192,57,43,.8)'),borderRadius:4}]},
+    options:{indexAxis:'y',responsive:true,maintainAspectRatio:true,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.raw+'% dari sasaran tahunan'}}},scales:{x:{min:0,max:Math.max(170,...opPcts.filter(p=>p)),ticks:{callback:v=>v+'%',font:{size:11}},grid:{color:'#f0f3f7'}},y:{ticks:{font:{size:11}}}}}});
+}
+function kpiCard(k){const ok=k.pct>=k.tgt;return `<div class="kpi-card"><span class="kpi-id">${k.id}</span><div class="kpi-name">${k.name}</div><div class="kpi-row"><span class="kpi-tgt">Sasaran: ≥${k.tgt}%</span><span class="kpi-pct ${ok?'pg':'pa'}">${k.pct}%</span></div><div class="prog"><div class="prog-fill ${ok?'fill-g':'fill-a'}" style="width:${Math.min(k.pct,100)}%"></div></div><span class="badge ${ok?'bg':'ba'}">${ok?'✅ CAPAI':'⚠️ PERLU TINDAKAN'} — ${k.num??''}/${k.den??''}</span></div>`;}
+function renderKpi(){document.getElementById('kpi-pk1').innerHTML=D.kpi.map(kpiCard).join('');document.getElementById('kpi-pk3').innerHTML=D.kpi3.map(kpiCard).join('');}
+function renderQap(){
+  function c(q){
+    if(q.pct===null) return `<div class="kpi-card"><span class="kpi-id qap">${q.id}</span><div class="kpi-name">${q.name}</div><div class="kpi-row"><span class="kpi-tgt">Standard: ≥${q.std}% | PIC: ${q.pic||''}</span><span class="kpi-pct" style="color:var(--muted);font-size:13px">NIL</span></div><div class="prog"><div class="prog-fill" style="width:0%"></div></div><span class="badge bm">⏸ BELUM BERMULA</span></div>`;
+    const ok=q.pct>=q.std;
+    return `<div class="kpi-card"><span class="kpi-id qap">${q.id}</span><div class="kpi-name">${q.name}</div><div class="kpi-row"><span class="kpi-tgt">Standard: ≥${q.std}% | PIC: ${q.pic||''}</span><span class="kpi-pct ${ok?'pg':'pa'}">${q.pct}%</span></div><div class="prog"><div class="prog-fill ${ok?'fill-g':'fill-a'}" style="width:${Math.min(q.pct,100)}%"></div></div><span class="badge ${ok?'bg':'ba'}">${ok?'✅ CAPAI':'⚠️ PERLU TINDAKAN'} ${q.num?`— ${q.num}/${q.den}`:''}</span></div>`;
+  }
+  document.getElementById('qap-grid').innerHTML=D.qap.map(c).join('');
+  const pc=v=>v!==null?`${v}%`:`<span style="color:var(--muted);font-style:italic">NIL</span>`;
+  document.getElementById('qap-table').innerHTML=D.qap.map(q=>`<tr><td class="td-b">${q.id} <span style="font-weight:400;color:var(--muted);font-size:11px">(${q.pic||''})</span><br><small style="font-weight:400;color:var(--muted)">${q.name.substring(0,60)}…</small></td><td>≥${q.std}%</td><td>${pc(q.janMac)}</td><td>${pc(q.aprJun)}</td><td>${pc(q.julSep)}</td><td class="td-b">${pc(q.pct)}</td><td>${q.pct!==null?(q.pct>=q.std?'<span class="tg">CAPAI ✅</span>':'<span class="ta">PERLU TINDAKAN ⚠️</span>'):'<span class="tm">⏸ BELUM BERMULA</span>'}</td></tr>`).join('');
+}
+function renderOutcome(){
+  function card(o){
+    const det=(o.num!==null&&o.den!==null)?`<div style="margin:8px 0 6px;border-top:1px dashed var(--border);padding-top:8px"><div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:3px"><span>${o.numLbl||'Numerator'}</span><strong style="color:var(--green)">${o.num.toLocaleString()}</strong></div><div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted)"><span>${o.denLbl||'Denominator'}</span><strong>${o.den.toLocaleString()}</strong></div></div>`:'';
+    const ok=o.pct>=o.tgt;
+    return `<div class="kpi-card"><span class="kpi-id">${o.id}</span>${o.pic?` <span style="font-size:11px;color:var(--muted)">· PIC: ${o.pic}</span>`:''}<div class="kpi-name">${o.name}</div><div class="kpi-row"><span class="kpi-tgt">Sasaran CPF: ${o.tgt}%</span><span class="kpi-pct ${ok?'pg':'pa'}">${o.pct}%</span></div><div class="prog"><div class="prog-fill ${ok?'fill-g':'fill-a'}" style="width:${Math.min(o.pct,100)}%"></div></div>${det}<span class="badge ${ok?'bg':'ba'}">${ok?'✅ CAPAI':'⚠️'} ${o.num!==null?`— ${o.num.toLocaleString()}/${o.den.toLocaleString()}`:''}</span></div>`;
+  }
+  document.getElementById('out1-grid').innerHTML=D.outcome.filter(o=>o.grp===1).map(card).join('');
+  document.getElementById('out2-grid').innerHTML=D.outcome.filter(o=>o.grp===2).map(card).join('');
+}
+function renderOutput(){
+  document.querySelector('#pane-output thead tr').innerHTML='<th style="min-width:250px">Indikator Output</th><th>PIC</th><th>Sasaran</th>'+['Jan','Feb','Mac','Apr','Mei','Jun','Julai','Ogo','Sep','Okt','Nov','Dis'].map(m=>`<th>${m}</th>`).join('')+'<th>Jumlah 2026</th><th style="min-width:100px">% Tahunan</th><th>Status</th>';
+  document.getElementById('output-table').innerHTML=D.output.map(r=>{
+    if(r.grp) return `<tr class="grp"><td colspan="18">${r.grp}</td></tr>`;
+    const p=pct(r.cum,r.annual);
+    return `<tr><td class="td-desc">${r.name}</td><td style="color:var(--muted)">${r.pic}</td><td>${r.annual?r.annual.toLocaleString():'—'}</td>${['jan','feb','mac','apr','mei','jun','jul','ogo','sep','okt','nov','dis'].map(m=>`<td>${cell(r[m])}</td>`).join('')}<td class="td-b">${(r.cum||0).toLocaleString()}</td><td>${mbar(p)}</td><td>${p===null?'<span class="tm">DATA</span>':`<span class="${statusClass(p)}">${statusLabel(p)}</span>`}</td></tr>`;
+  }).join('');
+}
+function renderAll(){
+  document.getElementById('banner-period').textContent='Data '+D.period;
+  document.getElementById('banner-month').textContent=MONTH_NAMES[D.month-1]||'—';
+  document.querySelectorAll('.thr-lbl').forEach(e=>{e.textContent=thr();});
+  document.querySelectorAll('#pane-ringkasan thead tr').forEach(tr=>{tr.children[2].textContent='Jumlah 2026';});
+  renderCards();renderTopRisk();renderKpi();renderQap();renderOutcome();renderOutput();renderCharts();
+}
+
+/* ───── PELAN TINDAKAN ───── */
+const PT_COL={'Selesai':'#1e8e54','Dalam Proses':'#d99413','Belum Mula':'#8794a3','Ditangguh':'#c0392b'};
+function ptLinkify(t){return (t||'').replace(/(https?:\/\/[^\s]+)/g,'<a href="$1" target="_blank" rel="noopener">$1</a>');}
+function ptFill(s){return s==='Selesai'?'fill-g':s==='Dalam Proses'?'fill-a':s==='Ditangguh'?'fill-r':'fill-m';}
+function ptBadge(s){return s==='Selesai'?'tg':s==='Dalam Proses'?'ta':s==='Ditangguh'?'tr':'tm';}
+function buildPT(rows){
+  return rows.filter(r=>PT_COL[S(r.status)]).map(r=>({
+    no:S(r.no),inisiatif:S(r.inisiatif),seksyen:S(r.seksyen),objektif:S(r.objektif),aktiviti:S(r.aktiviti),
+    indikator:S(r.indikator),sasaran:S(r.sasaran),pelaksanaan:S(r.pelaksanaan),mula:S(r.mula),tamat:S(r.tamat),
+    status:S(r.status),pct:N(r.pct)||0,maklumbalas:S(r.maklumbalas),halangan:S(r.halangan),susulan:S(r.susulan)
+  }));
+}
+function renderPtCards(){
+  const c={total:PT_DATA.length,Selesai:0,'Dalam Proses':0,'Belum Mula':0,Ditangguh:0};
+  PT_DATA.forEach(d=>c[d.status]++);
+  const avg=PT_DATA.length?Math.round(PT_DATA.reduce((a,d)=>a+d.pct,0)/PT_DATA.length):0;
+  document.getElementById('pt-cards').innerHTML=`
+    <div class="card"><div class="lbl">Jumlah Inisiatif</div><div class="val">${c.total}</div><div class="sub">Pelan Tindakan 2026</div></div>
+    <div class="card g"><div class="lbl">Selesai</div><div class="val">${c.Selesai}</div><div class="sub">✅ 100%</div></div>
+    <div class="card a"><div class="lbl">Dalam Proses</div><div class="val">${c['Dalam Proses']}</div><div class="sub">🟡 berjalan</div></div>
+    <div class="card m"><div class="lbl">Belum Mula</div><div class="val">${c['Belum Mula']}</div><div class="sub">⏸ dijadual</div></div>
+    <div class="card r"><div class="lbl">Ditangguh</div><div class="val">${c.Ditangguh}</div><div class="sub">⚠️ tergendala</div></div>
+    <div class="card"><div class="lbl">Purata Capaian</div><div class="val">${avg}%</div><div class="sub">semua inisiatif</div></div>`;
+}
+function drawPtCharts(){
+  if(!PT_DATA.length) return;
+  const c={Selesai:0,'Dalam Proses':0,'Belum Mula':0,Ditangguh:0}; PT_DATA.forEach(d=>c[d.status]++);
+  if(charts.ptStat) charts.ptStat.destroy();
+  charts.ptStat=new Chart(document.getElementById('ptStatChart').getContext('2d'),{type:'doughnut',
+    data:{labels:Object.keys(PT_COL),datasets:[{data:Object.keys(PT_COL).map(k=>c[k]),backgroundColor:Object.values(PT_COL),borderWidth:3,borderColor:'#fff'}]},
+    options:{responsive:true,maintainAspectRatio:true,cutout:'58%',plugins:{legend:{position:'bottom',labels:{font:{size:11},padding:12,usePointStyle:true}}}}});
+}
+function renderPtList(){
+  const list=document.getElementById('pt-list');
+  const f=PT_DATA.filter(d=>(ptFilter==='all'||d.status===ptFilter)&&((d.inisiatif+d.seksyen).toLowerCase().includes(ptQ)));
+  if(!f.length){list.innerHTML='<div style="text-align:center;color:var(--muted);padding:30px">Tiada inisiatif sepadan.</div>';return;}
+  const row=(l,v)=>v?`<div style="display:grid;grid-template-columns:120px 1fr;gap:10px;padding:5px 0;border-bottom:1px solid var(--faint);font-size:11px"><span style="color:var(--muted);font-weight:700">${l}</span><span>${ptLinkify(v)}</span></div>`:'';
+  list.innerHTML=f.map(d=>`<div class="pt-item" data-s="${d.status}"><div class="pt-top"><div class="pt-ttl"><span class="no">${d.no}.</span> ${d.inisiatif}</div><span class="${ptBadge(d.status)}">${d.status}</span></div><div class="pt-sek">🏛️ ${d.seksyen}</div><div class="prog"><div class="prog-fill ${ptFill(d.status)}" style="width:${d.pct}%"></div></div><div class="pt-meta"><span>📅 <b>${d.mula}</b> → <b>${d.tamat}</b></span><span>📈 <b>${d.pct}%</b></span>${d.susulan?`<span>🔁 ${d.susulan}</span>`:''}</div>${(d.objektif||d.aktiviti||d.indikator)?`<details style="margin-top:10px"><summary style="cursor:pointer;font-size:11px;font-weight:700;color:var(--blue)">Lihat butiran</summary><div style="border-top:1px dashed var(--border);padding-top:8px;margin-top:6px">${row('🎯 Objektif',d.objektif)}${row('📝 Aktiviti',d.aktiviti)}${row('📊 Indikator',d.indikator)}${row('🎚️ Sasaran',d.sasaran)}${row('⚙️ Pelaksanaan',d.pelaksanaan)}</div></details>`:''}${d.maklumbalas?`<div class="pt-note fb">💬 ${ptLinkify(d.maklumbalas)}</div>`:''}${d.halangan?`<div class="pt-note hl">⚠️ Halangan: ${d.halangan}</div>`:''}</div>`).join('');
+}
+
+/* ───── LOAD ALL ───── */
+function showSetup(extra){
+  document.getElementById('setup-msg').innerHTML=`<div class="setup"><h2>⚙️ Perlu Sediakan Sumber Data</h2>
+    <p>Dashboard belum disambung ke Google Sheet. ${extra||''}</p>
+    <ol>
+      <li>Buka Google Sheet anda, salin <code>SHEET_ID</code> dari URL (antara <code>/d/</code> dan <code>/edit</code>).</li>
+      <li>Edit fail HTML ini, cari blok <code>const CONFIG</code> di atas, tampal ID itu pada <code>SHEET_ID</code>.</li>
+      <li>Pastikan tab bernama <code>DATA</code> dan <code>PELAN</code> wujud (rujuk templat).</li>
+      <li>Kongsi Sheet: <strong>Share → Anyone with the link → Viewer</strong>.</li>
+      <li>Simpan & buka semula fail ini.</li>
+    </ol></div>`;
+}
+async function loadAll(){
+  const btn=document.getElementById('refreshBtn'); btn.disabled=true;
+  document.body.classList.add('data-loading');
+  document.getElementById('lastUpd').textContent='⏳ Memuatkan…';
+  document.getElementById('setup-msg').innerHTML='';
+  ['summary-cards','top-table','risk-table','kpi-pk1','kpi-pk3','qap-grid','qap-table','out1-grid','out2-grid','output-table'].forEach(id=>{document.getElementById(id).innerHTML='';});
+  document.getElementById('gaugeBig').textContent='—';
+  document.getElementById('gaugeSub').textContent='Memuatkan data';
+  const notes=[];
+
+  // DATA (KPI/OBB/QAP) — muat berasingan
+  try{
+    const dataRows = await fetchRows('data');
+    D = buildD(dataRows);
+    renderAll();
+    document.body.classList.remove('data-loading');
+    notes.push(`DATA ✓ (${dataRows.length} baris)`);
+  }catch(e){
+    notes.push('DATA ✗ '+(e&&e.message?e.message:e));
+    ['gauge','kpi','output'].forEach(key=>{if(charts[key]){charts[key].destroy();delete charts[key];}});
+  }
+
+  // PELAN (Pelan Tindakan) — muat berasingan
+  try{
+    const ptRows = await fetchRows('pelan');
+    PT_DATA = buildPT(ptRows);
+    renderPtCards(); renderPtList(); drawPtCharts();
+    notes.push(`PELAN ✓ (${PT_DATA.length} inisiatif)`);
+  }catch(e){
+    notes.push('PELAN ✗ '+(e&&e.message?e.message:e));
+    document.getElementById('pt-list').innerHTML='<div style="text-align:center;color:var(--red);padding:30px">⚠️ Gagal baca PELAN. '+(e&&e.message?e.message:e)+'</div>';
+  }
+
+  const ok = notes.every(n=>n.includes('✓'));
+  if(!ok) showSetup('Status muat: '+notes.join(' · ')+'. Cuba Refresh. Jika masih gagal, hubungi pentadbir SKIPPF.');
+  document.getElementById('lastUpd').textContent=(ok?'LIVE — ':'⚠️ Sebahagian — ')+new Date().toLocaleString('ms-MY');
+  btn.disabled=false;
+}
+document.addEventListener('DOMContentLoaded',()=>{
+  document.getElementById('pt-search').oninput=e=>{ptQ=e.target.value.toLowerCase();renderPtList();};
+  document.querySelectorAll('.pt-fbtn').forEach(b=>b.onclick=()=>{document.querySelectorAll('.pt-fbtn').forEach(x=>x.classList.remove('active'));b.classList.add('active');ptFilter=b.dataset.f;renderPtList();});
+  loadAll();
+  setInterval(loadAll, 5 * 60 * 1000);
+});
+</script>
+
+
+</body></html>
